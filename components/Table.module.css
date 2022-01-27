@@ -1,0 +1,29 @@
+.table {
+  background: white;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  max-width: 80vw;
+  max-height: 75vh;
+  overflow: auto;
+}
+
+.cell {
+  align-items: center;
+  border-bottom: 1px solid #EDF1F2;
+  color: #3F464F;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-weight: 500;
+  height: 40px;
+  overflow: hidden;
+  padding: 8px 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header {
+  background-color: #EDF1F2;
+  color: #18181A;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+}
