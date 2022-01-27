@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import clsx from "clsx";
 import { useTable, useFlexLayout } from "react-table";
+import { useFakeData } from "../hooks/useFakeData";
 import { Checkmark } from "./Checkmark";
-import { generateRows } from "./data";
 import styles from "./Table.module.css";
+import { LoadMoreRow } from "./LoadMoreRow";
 
 export const Table = () => {
-  const data = React.useMemo(() => generateRows(50), []);
+  const { data, fetch, isLoading } = useFakeData();
+
+  useEffect(() => fetch(), [fetch]);
 
   const columns = React.useMemo(
     () => [
@@ -37,13 +40,13 @@ export const Table = () => {
 
   return (
     <div {...instance.getTableProps()} className={styles.table}>
-      <div>
+      <div className={styles.header}>
         {instance.headerGroups.map((headerGroup) => (
           <div {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
               <div
                 {...column.getHeaderProps()}
-                className={clsx(styles.cell, styles.header)}
+                className={clsx(styles.cell, styles.headerCell)}
               >
                 {column.render("Header")}
               </div>
@@ -51,7 +54,7 @@ export const Table = () => {
           </div>
         ))}
       </div>
-      <div {...instance.getTableBodyProps()}>
+      <div {...instance.getTableBodyProps()} className={styles.body}>
         {instance.rows.map((row) => {
           instance.prepareRow(row);
           return (
@@ -66,11 +69,17 @@ export const Table = () => {
             </div>
           );
         })}
+        <LoadMoreRow
+          className={styles.cell}
+          isLoading={isLoading}
+          onLoadMore={fetch}
+        />
       </div>
     </div>
   );
 };
 
-const DateCell = ({ value }) => value.toLocaleDateString();
+const BooleanCell = ({ value }) =>
+  value !== undefined ? <Checkmark checked={value} /> : "";
 
-const BooleanCell = ({ value }) => <Checkmark checked={value} />;
+const DateCell = ({ value }) => (value ? value.toLocaleDateString() : "");
