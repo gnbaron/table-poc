@@ -2,8 +2,15 @@
   background: white;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
   max-width: 80vw;
+  min-width: 80vw;
   max-height: 75vh;
+  min-height: 75vh;
   overflow: auto;
+}
+
+.header {
+  position: sticky;
+  top: 0;
 }
 
 .cell {
@@ -21,9 +28,13 @@
   white-space: nowrap;
 }
 
-.header {
+.headerCell {
   background-color: #EDF1F2;
-  color: #18181A;
+  color: #2c2c2e;
   font-weight: 600;
   letter-spacing: 0.25px;
+}
+
+.body {
+  padding-bottom: 6rem;
 }
