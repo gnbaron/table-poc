@@ -1,15 +1,20 @@
-import React, { useEffect } from "react";
+import React from "react";
 import clsx from "clsx";
 import { useTable, useFlexLayout } from "react-table";
+import { FixedSizeList as List } from "react-window";
 import { useFakeData } from "../hooks/useFakeData";
 import { Checkmark } from "./Checkmark";
+import { scrollbarWidth } from "./utils/scrollbarWidth";
 import styles from "./Table.module.css";
-import { LoadMoreRow } from "./LoadMoreRow";
 
 export const Table = () => {
-  const { data, fetch, isLoading } = useFakeData();
+  const { data, fetch } = useFakeData();
 
-  useEffect(() => fetch(), [fetch]);
+  React.useEffect(() => fetch(), [fetch]);
+
+  const defaultColumn = {
+    Header: ({ column }) => column.id,
+  };
 
   const columns = React.useMemo(
     () => [
@@ -32,16 +37,44 @@ export const Table = () => {
     []
   );
 
-  const defaultColumn = {
-    Header: ({ column }) => column.id,
-  };
+  const {
+    getTableBodyProps,
+    getTableProps,
+    headerGroups,
+    prepareRow,
+    rows,
+    totalColumnsWidth,
+  } = useTable({ columns, data, defaultColumn }, useFlexLayout);
 
-  const instance = useTable({ columns, data, defaultColumn }, useFlexLayout);
+  const RowRenderer = React.useCallback(
+    ({ index, style }) => {
+      const row = rows[index];
+      prepareRow(row);
+      return (
+        <div
+          {...row.getRowProps({
+            style,
+          })}
+        >
+          {row.cells.map((cell) => {
+            return (
+              <div {...cell.getCellProps()} className={styles.cell}>
+                {cell.render("Cell")}
+              </div>
+            );
+          })}
+        </div>
+      );
+    },
+    [prepareRow, rows]
+  );
+
+  const scrollBarSize = React.useMemo(() => scrollbarWidth(), []);
 
   return (
-    <div {...instance.getTableProps()} className={styles.table}>
+    <div {...getTableProps()} className={styles.table}>
       <div className={styles.header}>
-        {instance.headerGroups.map((headerGroup) => (
+        {headerGroups.map((headerGroup) => (
           <div {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
               <div
@@ -54,26 +87,20 @@ export const Table = () => {
           </div>
         ))}
       </div>
-      <div {...instance.getTableBodyProps()} className={styles.body}>
-        {instance.rows.map((row) => {
-          instance.prepareRow(row);
-          return (
-            <div {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return (
-                  <div {...cell.getCellProps()} className={styles.cell}>
-                    {cell.render("Cell")}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
-        <LoadMoreRow
+      <div {...getTableBodyProps()}>
+        <List
+          height={700}
+          itemCount={rows.length}
+          itemSize={40}
+          width={totalColumnsWidth + scrollBarSize}
+        >
+          {RowRenderer}
+        </List>
+        {/* <LoadMoreRow
           className={styles.cell}
           isLoading={isLoading}
           onLoadMore={fetch}
-        />
+        /> */}
       </div>
     </div>
   );

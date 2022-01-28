@@ -9,7 +9,7 @@ export const useFakeData = () => {
     console.log("fetching");
     setIsLoading(true);
     setTimeout(() => {
-      setData((prevData) => [...prevData, ...generateRows(100)]);
+      setData((prevData) => [...prevData, ...generateRows(2000)]);
       setIsLoading(false);
     }, 500);
   }, []);
