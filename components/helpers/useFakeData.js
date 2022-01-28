@@ -1,23 +1,19 @@
-import { useCallback, useState } from "react";
 import faker from "faker";
+import React from "react";
+
+const TOTAL_ROWS = 2000;
 
 export const useFakeData = () => {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = React.useState([]);
 
-  const fetch = useCallback(() => {
-    console.log("fetching");
-    setIsLoading(true);
-    setTimeout(() => {
-      setData((prevData) => [...prevData, ...generateRows(2000)]);
-      setIsLoading(false);
-    }, 500);
+  React.useEffect(() => {
+    setData(generateRows(TOTAL_ROWS));
   }, []);
 
-  return { data, fetch, isLoading };
+  return { data, total: TOTAL_ROWS };
 };
 
-const generateRows = (n) => new Array(n).fill(null).map(() => randomRow());
+const generateRows = (n) => new Array(n).fill(null).map(randomRow);
 
 const randomRow = () => ({
   Account_Name: faker.company.companyName(),

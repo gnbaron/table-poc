@@ -2,15 +2,13 @@ import React from "react";
 import clsx from "clsx";
 import { useTable, useFlexLayout } from "react-table";
 import { FixedSizeList as List } from "react-window";
-import { useFakeData } from "../hooks/useFakeData";
+import { useFakeData } from "./helpers/useFakeData";
 import { Checkmark } from "./Checkmark";
-import { scrollbarWidth } from "./utils/scrollbarWidth";
+import { scrollbarWidth } from "./helpers/scrollbarWidth";
 import styles from "./Table.module.css";
 
 export const Table = () => {
-  const { data, fetch } = useFakeData();
-
-  React.useEffect(() => fetch(), [fetch]);
+  const { data } = useFakeData();
 
   const defaultColumn = {
     Header: ({ column }) => column.id,
@@ -90,17 +88,12 @@ export const Table = () => {
       <div {...getTableBodyProps()}>
         <List
           height={700}
-          itemCount={rows.length}
+          itemCount={data.length}
           itemSize={40}
           width={totalColumnsWidth + scrollBarSize}
         >
           {RowRenderer}
         </List>
-        {/* <LoadMoreRow
-          className={styles.cell}
-          isLoading={isLoading}
-          onLoadMore={fetch}
-        /> */}
       </div>
     </div>
   );
