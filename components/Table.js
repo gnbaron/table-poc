@@ -19,21 +19,12 @@ export const Table = () => {
 
   const columns = React.useMemo(
     () => [
-      { accessor: "Account_Name" },
-      { accessor: "ACV" },
+      { accessor: "Id" },
       { accessor: "ARR", Header: "ARR 💸" },
       { accessor: "CloseDate", Cell: DateCell },
       { accessor: "CreatedAt", Cell: DateCell },
-      { accessor: "DealAmount" },
       { accessor: "DealClosed", Cell: BooleanCell },
-      { accessor: "DealWon", Cell: BooleanCell },
-      { accessor: "Id" },
-      { accessor: "Notes" },
-      { accessor: "PaidDate", Cell: DateCell },
-      { accessor: "SpltAmount" },
-      { accessor: "SplitDeal", Cell: BooleanCell },
-      { accessor: "TCV" },
-      { accessor: "UpdatedAt", Cell: DateCell },
+      { accessor: "Account_Name" },
     ],
     []
   )
@@ -53,7 +44,7 @@ export const Table = () => {
       const from = result.source.index
       const to = result.destination?.index
 
-      if (!to || from === to) return
+      if (to === undefined || from === to) return
 
       const columns = [...headers]
       moveItem(columns, from, to)
@@ -73,7 +64,7 @@ export const Table = () => {
             {...row.getRowProps({
               style,
             })}
-            layout
+            className={styles.row}
             initial={{ opacity: 0 }}
             animate={{ duration: 50, opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -104,11 +95,11 @@ export const Table = () => {
             }
           >
             <Droppable droppableId="droppable" direction="horizontal">
-              {(provided, snapshot) => (
+              {(provided) => (
                 <div
                   ref={provided.innerRef}
-                  {...provided.droppableProps}
                   {...headerGroup.getHeaderGroupProps()}
+                  {...provided.droppableProps}
                 >
                   {headerGroup.headers.map((column, index) => (
                     <Draggable
@@ -125,7 +116,11 @@ export const Table = () => {
                         >
                           <div
                             {...column.getHeaderProps()}
-                            className={clsx(styles.cell, styles.headerCell)}
+                            className={clsx(
+                              styles.cell,
+                              styles.headerCell,
+                              snapshot.isDragging && styles.draggingCell
+                            )}
                           >
                             {column.render("Header")}
                           </div>
