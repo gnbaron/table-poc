@@ -1,19 +1,19 @@
-import faker from "faker";
-import React from "react";
+import faker from "faker"
+import React from "react"
 
-const TOTAL_ROWS = 2000;
+const TOTAL_ROWS = 500
 
 export const useFakeData = () => {
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState([])
 
   React.useEffect(() => {
-    setData(generateRows(TOTAL_ROWS));
-  }, []);
+    setData(generateRows(TOTAL_ROWS))
+  }, [])
 
-  return { data, total: TOTAL_ROWS };
-};
+  return { data, total: TOTAL_ROWS }
+}
 
-const generateRows = (n) => new Array(n).fill(null).map(randomRow);
+const generateRows = (n) => new Array(n).fill(null).map(randomRow)
 
 const randomRow = () => ({
   Account_Name: faker.company.companyName(),
@@ -31,4 +31,4 @@ const randomRow = () => ({
   SplitDeal: faker.datatype.boolean(),
   TCV: faker.finance.amount(),
   UpdatedAt: faker.date.recent(),
-});
+})

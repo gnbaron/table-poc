@@ -1,7 +1,8 @@
 .table {
   background: white;
   border-radius: 5px;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
   max-width: 80vw;
   min-width: 80vw;
   /* max-height: 75vh;
@@ -16,8 +17,8 @@
 
 .cell {
   align-items: center;
-  border-bottom: 1px solid #EDF1F2;
-  color: #3F464F;
+  border-bottom: 1px solid #edf1f2;
+  color: #3f464f;
   display: flex;
   flex-wrap: wrap;
   font-size: 12px;
@@ -30,7 +31,7 @@
 }
 
 .headerCell {
-  background-color: #EDF1F2;
+  background-color: #edf1f2;
   color: #2c2c2e;
   font-weight: 600;
   height: 48px;
