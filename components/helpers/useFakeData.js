@@ -1,16 +1,14 @@
 import faker from "faker"
 import React from "react"
 
-const TOTAL_ROWS = 500
-
-export const useFakeData = () => {
+export const useFakeData = ({ total }) => {
   const [data, setData] = React.useState([])
 
   React.useEffect(() => {
-    setData(generateRows(TOTAL_ROWS))
-  }, [])
+    setData(generateRows(total))
+  }, [total])
 
-  return { data, total: TOTAL_ROWS }
+  return { data }
 }
 
 const generateRows = (n) => new Array(n).fill(null).map(randomRow)

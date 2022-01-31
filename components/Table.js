@@ -16,10 +16,10 @@ import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
 import styles from "./Table.module.css"
 
-const INDEX_CELL_WIDTH = 40
+const TOTAL_ROWS = 500
 
 export const Table = () => {
-  const { data } = useFakeData()
+  const { data } = useFakeData({ total: TOTAL_ROWS })
 
   const defaultColumn = {
     Cell: (props) => <Cell align="left">{props.value}</Cell>,
@@ -156,74 +156,75 @@ export const Table = () => {
   return (
     <div {...getTableProps()} className={styles.table}>
       <div className={styles.header} onContextMenu={handleHeaderContextMenu}>
-        {headerGroups.map((headerGroup) => (
-          <DragDropContext
-            onDragEnd={(result) =>
-              handleUpdateColumnOrder(headerGroup.headers, result)
-            }
-          >
-            <Droppable droppableId="droppable" direction="horizontal">
-              {(provided, droppableSnapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...headerGroup.getHeaderGroupProps()}
-                  {...provided.droppableProps}
-                >
+        {headerGroups.map((headerGroup) => {
+          const headerGroupProps = headerGroup.getHeaderGroupProps()
+          return (
+            <DragDropContext
+              key={headerGroupProps.key}
+              onDragEnd={(result) =>
+                handleUpdateColumnOrder(headerGroup.headers, result)
+              }
+            >
+              <Droppable droppableId="droppable" direction="horizontal">
+                {(provided, droppableSnapshot) => (
                   <div
-                    className={clsx(
-                      styles.cell,
-                      styles.headerCell,
-                      styles.indexCell,
-                      styles.headerIndexCell
-                    )}
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    {...headerGroup.getHeaderGroupProps()}
                   >
-                    #
-                  </div>
-                  {headerGroup.headers.map((column, index) => (
                     <div
-                      className={styles.headerColumn}
-                      data-column-id={column.id}
+                      className={clsx(
+                        styles.cell,
+                        styles.headerCell,
+                        styles.indexCell,
+                        styles.headerIndexCell
+                      )}
                     >
-                      <Draggable
-                        key={column.id}
-                        draggableId={column.id}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={provided.draggableProps.style}
-                          >
-                            {column.render("Header", {
-                              isDragging: snapshot.isDragging,
-                            })}
-                          </div>
-                        )}
-                      </Draggable>
-                      <div
-                        className={clsx(
-                          styles.resizer,
-                          droppableSnapshot.isDraggingOver && styles.hidden
-                        )}
-                        {...column.getResizerProps()}
-                      />
+                      #
                     </div>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        ))}
+                    {headerGroup.headers.map((column, index) => (
+                      <div
+                        key={column.id}
+                        className={styles.headerColumn}
+                        data-column-id={column.id}
+                      >
+                        <Draggable draggableId={column.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={provided.draggableProps.style}
+                            >
+                              {column.render("Header", {
+                                isDragging: snapshot.isDragging,
+                              })}
+                            </div>
+                          )}
+                        </Draggable>
+                        <div
+                          className={clsx(
+                            styles.resizer,
+                            droppableSnapshot.isDraggingOver && styles.hidden
+                          )}
+                          {...column.getResizerProps()}
+                        />
+                      </div>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )
+        })}
       </div>
       <div {...getTableBodyProps()}>
         <List
           height={850}
           itemCount={data.length}
           itemSize={40}
-          width={totalColumnsWidth + scrollBarSize + INDEX_CELL_WIDTH}
+          width={totalColumnsWidth + scrollBarSize + 40 /* Index cell */}
         >
           {RowRenderer}
         </List>
