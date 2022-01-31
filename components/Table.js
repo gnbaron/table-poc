@@ -10,6 +10,8 @@ import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
 import styles from "./Table.module.css"
 
+const INDEX_CELL_WIDTH = 40
+
 export const Table = () => {
   const { data } = useFakeData()
 
@@ -153,7 +155,7 @@ export const Table = () => {
           height={700}
           itemCount={data.length}
           itemSize={40}
-          width={totalColumnsWidth + scrollBarSize}
+          width={totalColumnsWidth + scrollBarSize + INDEX_CELL_WIDTH}
         >
           {RowRenderer}
         </List>
