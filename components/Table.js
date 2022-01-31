@@ -16,17 +16,49 @@ export const Table = () => {
   const { data } = useFakeData()
 
   const defaultColumn = {
-    Header: ({ column }) => column.id,
+    Cell: (props) => <Cell align="left">{props.value}</Cell>,
+    Header: (props) => <Header align="left" {...props} />,
   }
 
   const columns = React.useMemo(
     () => [
-      { accessor: "Id" },
-      { accessor: "ARR", Header: "ARR 💸" },
-      { accessor: "CloseDate", Cell: DateCell },
-      { accessor: "CreatedAt", Cell: DateCell },
-      { accessor: "DealClosed", Cell: BooleanCell },
-      { accessor: "Account_Name" },
+      { accessor: "Id", width: 260 },
+      {
+        accessor: "ARR",
+        Cell: (props) => <Cell align="right">{props.value}</Cell>,
+        Header: (props) => <Header align="right" {...props} />,
+      },
+      {
+        accessor: "CloseDate",
+        Cell: (props) => (
+          <Cell align="center">
+            <DateCell {...props} />
+          </Cell>
+        ),
+        Header: (props) => <Header align="center" {...props} />,
+        width: 110,
+      },
+      {
+        accessor: "CreatedAt",
+        Cell: (props) => (
+          <Cell align="center">
+            <DateCell {...props} />
+          </Cell>
+        ),
+        Header: (props) => <Header align="center" {...props} />,
+        width: 110,
+      },
+      {
+        accessor: "DealClosed",
+        Cell: (props) => (
+          <Cell align="center">
+            <BooleanCell {...props} />
+          </Cell>
+        ),
+        Header: (props) => <Header align="center" {...props} />,
+        width: 100,
+      },
+      { accessor: "Account_Name", width: 225 },
     ],
     []
   )
@@ -129,16 +161,9 @@ export const Table = () => {
                           {...provided.dragHandleProps}
                           style={provided.draggableProps.style}
                         >
-                          <div
-                            {...column.getHeaderProps()}
-                            className={clsx(
-                              styles.cell,
-                              styles.headerCell,
-                              snapshot.isDragging && styles.draggingCell
-                            )}
-                          >
-                            {column.render("Header")}
-                          </div>
+                          {column.render("Header", {
+                            isDragging: snapshot.isDragging,
+                          })}
                         </div>
                       )}
                     </Draggable>
@@ -164,7 +189,34 @@ export const Table = () => {
   )
 }
 
-const BooleanCell = ({ value }) =>
-  value !== undefined ? <Checkmark checked={value} /> : ""
+const Header = React.memo(({ align, ...props }) => {
+  return (
+    <div
+      className={clsx(
+        styles.cell,
+        styles.headerCell,
+        styles[align],
+        props.isDragging && styles.draggingCell
+      )}
+      {...props.column.getHeaderProps()}
+    >
+      {props.column.id}
+    </div>
+  )
+})
+Header.displayName = "Header"
 
-const DateCell = ({ value }) => (value ? value.toLocaleDateString() : "")
+const Cell = React.memo(({ align, children }) => (
+  <div className={clsx(styles.cellValue, styles[align])}>{children}</div>
+))
+Cell.displayName = "Cell"
+
+const BooleanCell = React.memo(({ value }) =>
+  value !== undefined ? <Checkmark checked={value} /> : ""
+)
+BooleanCell.displayName = "BooleanCell"
+
+const DateCell = React.memo(({ value }) =>
+  value ? value.toLocaleDateString() : ""
+)
+DateCell.displayName = "DateCell"

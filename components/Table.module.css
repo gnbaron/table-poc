@@ -34,6 +34,16 @@
   white-space: nowrap;
 }
 
+.cellValue {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.left { justify-content: flex-start; }
+.right { justify-content: flex-end; }
+.center { justify-content: center; }
+
 .headerCell {
   background: #edf1f2;
   border: 0;
