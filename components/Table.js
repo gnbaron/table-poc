@@ -177,7 +177,7 @@ export const Table = () => {
       </div>
       <div {...getTableBodyProps()}>
         <List
-          height={700}
+          height={850}
           itemCount={data.length}
           itemSize={40}
           width={totalColumnsWidth + scrollBarSize + INDEX_CELL_WIDTH}
