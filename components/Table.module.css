@@ -99,3 +99,11 @@ div.headerIndexCell {
   background: #e1e5e6;
   border-radius: 5px;
 }
+
+.menuItem {
+  font-size: 14px;
+}
+
+.menuItem span {
+  margin-left: 12px;
+}

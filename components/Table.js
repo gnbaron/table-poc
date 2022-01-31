@@ -8,6 +8,8 @@ import {
 } from "react-table"
 import { FixedSizeList as List } from "react-window"
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
+import { animation, Item, Menu, useContextMenu } from "react-contexify"
+import "react-contexify/dist/ReactContexify.css"
 import { useFakeData } from "./helpers/useFakeData"
 import { Checkmark } from "./Checkmark"
 import { scrollbarWidth } from "./helpers/scrollbarWidth"
@@ -36,6 +38,7 @@ export const Table = () => {
         ),
         Header: (props) => <HeaderCell align="right" {...props} />,
         minWidth: 90,
+        width: 100,
       },
       {
         accessor: "CloseDate",
@@ -105,6 +108,16 @@ export const Table = () => {
     [setColumnOrder]
   )
 
+  const { show } = useContextMenu({ id: HEADER_CONTEXT_MENU_ID })
+
+  const handleHeaderContextMenu = React.useCallback(
+    (event) => {
+      event.preventDefault()
+      show(event)
+    },
+    [show]
+  )
+
   const RowRenderer = React.useCallback(
     ({ index, style }) => {
       const row = rows[index]
@@ -134,7 +147,7 @@ export const Table = () => {
 
   return (
     <div {...getTableProps()} className={styles.table}>
-      <div className={styles.header}>
+      <div className={styles.header} onContextMenu={handleHeaderContextMenu}>
         {headerGroups.map((headerGroup) => (
           <DragDropContext
             onDragEnd={(result) =>
@@ -204,6 +217,7 @@ export const Table = () => {
           {RowRenderer}
         </List>
       </div>
+      <HeaderContextMenu />
     </div>
   )
 }
@@ -249,3 +263,29 @@ const DateCell = React.memo(({ value }) =>
   value ? value.toLocaleDateString() : ""
 )
 DateCell.displayName = "DateCell"
+
+const HEADER_CONTEXT_MENU_ID = "HEADER_CONTEXT_MENU"
+
+const HeaderContextMenu = () => (
+  <Menu
+    id={HEADER_CONTEXT_MENU_ID}
+    animation={{ enter: animation.fade, exit: false }}
+    theme="dark"
+  >
+    <Item className={styles.menuItem} onClick={() => console.log("hide")}>
+      👀 <span>Hide column</span>
+    </Item>
+    <Item className={styles.menuItem}>
+      👈 <span>Insert left</span>
+    </Item>
+    <Item className={styles.menuItem}>
+      👉 <span>Insert right</span>
+    </Item>
+    <Item className={styles.menuItem}>
+      💬 <span>Add comment</span>
+    </Item>
+    <Item className={styles.menuItem}>
+      🗑 <span>Delete</span>
+    </Item>
+  </Menu>
+)
