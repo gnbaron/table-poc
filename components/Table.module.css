@@ -15,6 +15,7 @@
 }
 
 .row {
+  align-items: center;
   border-bottom: 1px solid #edf1f2;
 }
 
@@ -40,6 +41,20 @@
   font-weight: 600;
   height: 48px;
   letter-spacing: 0.25px;
+}
+
+.indexCell {
+  align-items: center;
+  color: #87898c;
+  display: flex;
+  font-size: 11px;
+  flex: 40 0 auto;
+  justify-content: center;
+  width: 40px
+}
+
+div.headerIndexCell {
+  flex-grow: 0;
 }
 
 .draggingCell {

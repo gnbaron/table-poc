@@ -69,6 +69,9 @@ export const Table = () => {
             animate={{ duration: 50, opacity: 1 }}
             exit={{ opacity: 0 }}
           >
+            <div className={clsx(styles.cell, styles.indexCell)}>
+              {index + 1}
+            </div>
             {row.cells.map((cell) => {
               return (
                 <motion.div {...cell.getCellProps()} className={styles.cell}>
@@ -101,6 +104,16 @@ export const Table = () => {
                   {...headerGroup.getHeaderGroupProps()}
                   {...provided.droppableProps}
                 >
+                  <div
+                    className={clsx(
+                      styles.cell,
+                      styles.headerCell,
+                      styles.indexCell,
+                      styles.headerIndexCell
+                    )}
+                  >
+                    #
+                  </div>
                   {headerGroup.headers.map((column, index) => (
                     <Draggable
                       key={column.id}
