@@ -1,9 +1,13 @@
 import React from "react"
 import clsx from "clsx"
-import { useTable, useFlexLayout, useColumnOrder } from "react-table"
+import {
+  useTable,
+  useFlexLayout,
+  useColumnOrder,
+  useResizeColumns,
+} from "react-table"
 import { FixedSizeList as List } from "react-window"
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
-import { AnimatePresence, motion } from "framer-motion"
 import { useFakeData } from "./helpers/useFakeData"
 import { Checkmark } from "./Checkmark"
 import { scrollbarWidth } from "./helpers/scrollbarWidth"
@@ -17,16 +21,17 @@ export const Table = () => {
 
   const defaultColumn = {
     Cell: (props) => <Cell align="left">{props.value}</Cell>,
-    Header: (props) => <Header align="left" {...props} />,
+    Header: (props) => <HeaderCell align="left" {...props} />,
   }
 
   const columns = React.useMemo(
     () => [
-      { accessor: "Id", width: 260 },
+      { accessor: "Id", minWidth: 270 },
       {
         accessor: "ARR",
         Cell: (props) => <Cell align="right">{props.value}</Cell>,
-        Header: (props) => <Header align="right" {...props} />,
+        Header: (props) => <HeaderCell align="right" {...props} />,
+        minWidth: 90,
       },
       {
         accessor: "CloseDate",
@@ -35,7 +40,8 @@ export const Table = () => {
             <DateCell {...props} />
           </Cell>
         ),
-        Header: (props) => <Header align="center" {...props} />,
+        Header: (props) => <HeaderCell align="center" {...props} />,
+        minWidth: 110,
         width: 110,
       },
       {
@@ -45,7 +51,8 @@ export const Table = () => {
             <DateCell {...props} />
           </Cell>
         ),
-        Header: (props) => <Header align="center" {...props} />,
+        Header: (props) => <HeaderCell align="center" {...props} />,
+        minWidth: 110,
         width: 110,
       },
       {
@@ -55,10 +62,11 @@ export const Table = () => {
             <BooleanCell {...props} />
           </Cell>
         ),
-        Header: (props) => <Header align="center" {...props} />,
+        Header: (props) => <HeaderCell align="center" {...props} />,
+        minWidth: 100,
         width: 100,
       },
-      { accessor: "Account_Name", width: 225 },
+      { accessor: "Account_Name", width: 225, minWidth: 150 },
     ],
     []
   )
@@ -71,7 +79,12 @@ export const Table = () => {
     rows,
     setColumnOrder,
     totalColumnsWidth,
-  } = useTable({ columns, data, defaultColumn }, useFlexLayout, useColumnOrder)
+  } = useTable(
+    { columns, data, defaultColumn },
+    useFlexLayout,
+    useColumnOrder,
+    useResizeColumns
+  )
 
   const handleUpdateColumnOrder = React.useCallback(
     (headers, result) => {
@@ -93,28 +106,21 @@ export const Table = () => {
       const row = rows[index]
       prepareRow(row)
       return (
-        <AnimatePresence>
-          <motion.div
-            {...row.getRowProps({
-              style,
-            })}
-            className={styles.row}
-            initial={{ opacity: 0 }}
-            animate={{ duration: 50, opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className={clsx(styles.cell, styles.indexCell)}>
-              {index + 1}
-            </div>
-            {row.cells.map((cell) => {
-              return (
-                <motion.div {...cell.getCellProps()} className={styles.cell}>
-                  {cell.render("Cell")}
-                </motion.div>
-              )
-            })}
-          </motion.div>
-        </AnimatePresence>
+        <div
+          {...row.getRowProps({
+            style,
+          })}
+          className={styles.row}
+        >
+          <div className={clsx(styles.cell, styles.indexCell)}>{index + 1}</div>
+          {row.cells.map((cell) => {
+            return (
+              <div {...cell.getCellProps()} className={styles.cell}>
+                {cell.render("Cell")}
+              </div>
+            )
+          })}
+        </div>
       )
     },
     [prepareRow, rows]
@@ -132,7 +138,7 @@ export const Table = () => {
             }
           >
             <Droppable droppableId="droppable" direction="horizontal">
-              {(provided) => (
+              {(provided, droppableSnapshot) => (
                 <div
                   ref={provided.innerRef}
                   {...headerGroup.getHeaderGroupProps()}
@@ -149,24 +155,33 @@ export const Table = () => {
                     #
                   </div>
                   {headerGroup.headers.map((column, index) => (
-                    <Draggable
-                      key={column.id}
-                      draggableId={column.id}
-                      index={index}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={provided.draggableProps.style}
-                        >
-                          {column.render("Header", {
-                            isDragging: snapshot.isDragging,
-                          })}
-                        </div>
-                      )}
-                    </Draggable>
+                    <div className={styles.headerColumn}>
+                      <Draggable
+                        key={column.id}
+                        draggableId={column.id}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={provided.draggableProps.style}
+                          >
+                            {column.render("Header", {
+                              isDragging: snapshot.isDragging,
+                            })}
+                          </div>
+                        )}
+                      </Draggable>
+                      <div
+                        className={clsx(
+                          styles.resizer,
+                          droppableSnapshot.isDraggingOver && styles.hidden
+                        )}
+                        {...column.getResizerProps()}
+                      />
+                    </div>
                   ))}
                   {provided.placeholder}
                 </div>
@@ -189,7 +204,7 @@ export const Table = () => {
   )
 }
 
-const Header = React.memo(({ align, ...props }) => {
+const HeaderCell = React.memo(({ align, ...props }) => {
   return (
     <div
       className={clsx(
@@ -204,7 +219,7 @@ const Header = React.memo(({ align, ...props }) => {
     </div>
   )
 })
-Header.displayName = "Header"
+HeaderCell.displayName = "HeaderCell"
 
 const Cell = React.memo(({ align, children }) => (
   <div className={clsx(styles.cellValue, styles[align])}>{children}</div>

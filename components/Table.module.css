@@ -46,6 +46,31 @@
 .right { justify-content: flex-end; }
 .center { justify-content: center; }
 
+.headerColumn {
+  display: flex;
+  position: relative;
+}
+
+.resizer {
+  align-items: center;
+  display: flex;
+  transition: opacity 100ms;
+}
+
+.resizer::after {
+  background-color: #bdbdbd;
+  content: "";
+  display: block;
+  height: 30%;
+  left: calc(100% - 2px);
+  position: absolute;
+  width: 2px;
+}
+
+.hidden {
+  opacity: 0;
+}
+
 .headerCell {
   background: #edf1f2;
   border: 0;

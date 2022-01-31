@@ -10,7 +10,6 @@
   "dependencies": {
     "clsx": "^1.1.1",
     "faker": "^5.5.3",
-    "framer-motion": "^6.2.3",
     "next": "12.0.8",
     "react": "17.0.2",
     "react-beautiful-dnd": "^13.1.0",
