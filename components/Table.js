@@ -29,7 +29,11 @@ export const Table = () => {
       { accessor: "Id", minWidth: 270 },
       {
         accessor: "ARR",
-        Cell: (props) => <Cell align="right">{props.value}</Cell>,
+        Cell: (props) => (
+          <Cell align="right">
+            <CurrencyCell {...props} />
+          </Cell>
+        ),
         Header: (props) => <HeaderCell align="right" {...props} />,
         minWidth: 90,
       },
@@ -230,6 +234,16 @@ const BooleanCell = React.memo(({ value }) =>
   value !== undefined ? <Checkmark checked={value} /> : ""
 )
 BooleanCell.displayName = "BooleanCell"
+
+const CurrencyCell = React.memo(({ value }) =>
+  value
+    ? new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(value)
+    : ""
+)
+CurrencyCell.displayName = "CurrencyCell"
 
 const DateCell = React.memo(({ value }) =>
   value ? value.toLocaleDateString() : ""
