@@ -82,6 +82,7 @@ export const Table = () => {
     getTableBodyProps,
     getTableProps,
     headerGroups,
+    toggleHideColumn,
     prepareRow,
     rows,
     setColumnOrder,
@@ -112,10 +113,17 @@ export const Table = () => {
 
   const handleHeaderContextMenu = React.useCallback(
     (event) => {
-      event.preventDefault()
-      show(event)
+      const columnHeader = event.target.closest("[data-column-id]")
+      show(event, { props: { columnId: columnHeader?.dataset.columnId } })
     },
     [show]
+  )
+
+  const handleHideColumn = React.useCallback(
+    ({ props }) => {
+      if (props.columnId) toggleHideColumn(props.columnId)
+    },
+    [toggleHideColumn]
   )
 
   const RowRenderer = React.useCallback(
@@ -172,7 +180,10 @@ export const Table = () => {
                     #
                   </div>
                   {headerGroup.headers.map((column, index) => (
-                    <div className={styles.headerColumn}>
+                    <div
+                      className={styles.headerColumn}
+                      data-column-id={column.id}
+                    >
                       <Draggable
                         key={column.id}
                         draggableId={column.id}
@@ -217,7 +228,7 @@ export const Table = () => {
           {RowRenderer}
         </List>
       </div>
-      <HeaderContextMenu />
+      <HeaderContextMenu onHideColumn={handleHideColumn} />
     </div>
   )
 }
@@ -266,13 +277,13 @@ DateCell.displayName = "DateCell"
 
 const HEADER_CONTEXT_MENU_ID = "HEADER_CONTEXT_MENU"
 
-const HeaderContextMenu = () => (
+const HeaderContextMenu = ({ onHideColumn }) => (
   <Menu
     id={HEADER_CONTEXT_MENU_ID}
     animation={{ enter: animation.fade, exit: false }}
     theme="dark"
   >
-    <Item className={styles.menuItem} onClick={() => console.log("hide")}>
+    <Item className={styles.menuItem} onClick={onHideColumn}>
       👀 <span>Hide column</span>
     </Item>
     <Item className={styles.menuItem}>
