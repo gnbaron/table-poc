@@ -138,7 +138,7 @@ export const Table = () => {
 
   const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
   const itemCount = !hasNext ? data.length : data.length + 3 // Skeleton loaders
-  const isItemLoaded = (index) => index < data.length
+  const isItemLoaded = React.useCallback((index) => index < data.length, [data])
   const width = totalColumnsWidth + scrollBarSize + 40 // Index cell
 
   const RowRenderer = React.useCallback(
@@ -163,7 +163,7 @@ export const Table = () => {
         </div>
       )
     },
-    [prepareRow, rows]
+    [isItemLoaded, prepareRow, rows, width]
   )
 
   return (
