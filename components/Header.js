@@ -62,6 +62,9 @@ export const Header = ({ headerGroups, onHideColumn, onUpdateColumnOrder }) => {
                     </div>
                   ))}
                   {provided.placeholder}
+                  <div className={styles.buttonWrapper}>
+                    <button className={styles.addButton}>+</button>
+                  </div>
                 </div>
               )}
             </Droppable>
