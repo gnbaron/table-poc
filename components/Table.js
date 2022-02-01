@@ -1,10 +1,12 @@
 import React, { useEffect } from "react"
+import clsx from "clsx"
 import {
   useTable,
   useFlexLayout,
   useColumnOrder,
   useResizeColumns,
   usePagination,
+  useRowSelect,
 } from "react-table"
 import { FixedSizeList as List } from "react-window"
 import InfiniteLoader from "react-window-infinite-loader"
@@ -99,6 +101,7 @@ export const Table = () => {
     state: { pageIndex, pageSize },
   } = useTable(
     {
+      autoResetSelectedRows: false,
       columns,
       data,
       defaultColumn,
@@ -109,7 +112,8 @@ export const Table = () => {
     useFlexLayout,
     useColumnOrder,
     useResizeColumns,
-    usePagination
+    usePagination,
+    useRowSelect
   )
 
   useEffect(() => fetch({ pageIndex, pageSize }), [fetch, pageIndex, pageSize])
@@ -151,7 +155,13 @@ export const Table = () => {
       const row = rows[index]
       prepareRow(row)
       return (
-        <div {...row.getRowProps({ style })} className={styles.row}>
+        <div
+          {...row.getRowProps({ style })}
+          className={clsx(styles.row, row.isSelected && styles.selected)}
+          onClick={(e) => {
+            if (e.metaKey) row.toggleRowSelected()
+          }}
+        >
           <IndexCell index={index} />
           {row.cells.map((cell) => {
             return (

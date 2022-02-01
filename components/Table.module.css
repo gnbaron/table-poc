@@ -18,3 +18,10 @@
 .row:nth-child(odd) {
   background-color: #f9f9f9;
 }
+
+.selected.row:nth-child(even) {
+  background-color: #ddd4f0;
+}
+.selected.row:nth-child(odd) {
+  background-color: #e7e0f9;
+}
