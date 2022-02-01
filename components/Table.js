@@ -1,12 +1,14 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
   useTable,
   useFlexLayout,
   useColumnOrder,
   useResizeColumns,
+  usePagination,
 } from "react-table"
 import { FixedSizeList as List } from "react-window"
-import { useFakeData } from "./helpers/useFakeData"
+import InfiniteLoader from "react-window-infinite-loader"
+import { useFakeLazyData } from "./helpers/useFakeData"
 import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
 import { Header } from "./Header"
@@ -18,13 +20,14 @@ import {
   HeaderCell,
   IndexCell,
 } from "./Cell"
+import { SkeletonLoader } from "./SkeletonLoader"
 import cellStyles from "./Cell.module.css"
 import styles from "./Table.module.css"
 
-const TOTAL_ROWS = 500
+const PAGE_SIZE = 50
 
 export const Table = () => {
-  const { data } = useFakeData({ total: TOTAL_ROWS })
+  const { data, fetch, hasNext, loading } = useFakeLazyData()
 
   const defaultColumn = {
     Cell: (props) => <Cell align="left">{props.value}</Cell>,
@@ -92,12 +95,24 @@ export const Table = () => {
     rows,
     setColumnOrder,
     totalColumnsWidth,
+    nextPage,
+    state: { pageIndex, pageSize },
   } = useTable(
-    { columns, data, defaultColumn },
+    {
+      columns,
+      data,
+      defaultColumn,
+      initialState: { pageIndex: 0, pageSize: PAGE_SIZE },
+      manualPagination: true,
+      pageCount: -1,
+    },
     useFlexLayout,
     useColumnOrder,
-    useResizeColumns
+    useResizeColumns,
+    usePagination
   )
+
+  useEffect(() => fetch({ pageIndex, pageSize }), [fetch, pageIndex, pageSize])
 
   const handleHideColumn = React.useCallback(
     ({ props }) => {
@@ -122,9 +137,17 @@ export const Table = () => {
   )
 
   const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
+  const itemCount = !hasNext ? data.length : data.length + 3 // Skeleton loaders
+  const isItemLoaded = (index) => index < data.length
+  const width = totalColumnsWidth + scrollBarSize + 40 // Index cell
 
   const RowRenderer = React.useCallback(
     ({ index, style }) => {
+      if (!isItemLoaded(index)) {
+        return (
+          <SkeletonLoader odd={index % 2 > 0} style={style} width={width} />
+        )
+      }
       const row = rows[index]
       prepareRow(row)
       return (
@@ -151,14 +174,24 @@ export const Table = () => {
         onUpdateColumnOrder={handleUpdateColumnOrder}
       />
       <div {...getTableBodyProps()}>
-        <List
-          height={850}
-          itemCount={data.length}
-          itemSize={40}
-          width={totalColumnsWidth + scrollBarSize + 40 /* Index cell */}
+        <InfiniteLoader
+          loadMoreItems={loading ? () => {} : nextPage}
+          isItemLoaded={isItemLoaded}
+          itemCount={itemCount}
         >
-          {RowRenderer}
-        </List>
+          {({ onItemsRendered, ref }) => (
+            <List
+              height={850}
+              itemCount={itemCount}
+              itemSize={40}
+              onItemsRendered={onItemsRendered}
+              ref={ref}
+              width={width}
+            >
+              {RowRenderer}
+            </List>
+          )}
+        </InfiniteLoader>
       </div>
     </div>
   )

@@ -12,5 +12,9 @@
   align-items: center;
 }
 
-.row:nth-child(even) { background-color: #f4f2f9; }
-.row:nth-child(odd) { background-color: #f9f9f9; }
+.row:nth-child(even) {
+  background-color: #f4f2f9;
+}
+.row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
