@@ -141,7 +141,7 @@ export const Table = () => {
   )
 
   const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
-  const itemCount = !hasNext ? data.length : data.length + 3 // Skeleton loaders
+  const itemCount = !hasNext ? data.length : data.length + 25 // Skeleton loaders
   const isItemLoaded = React.useCallback((index) => index < data.length, [data])
   const width = totalColumnsWidth + scrollBarSize + 40 // Index cell
 
