@@ -1,0 +1,53 @@
+.cell {
+  align-items: center;
+  color: #3f464f;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-weight: 500;
+  height: 40px;
+  overflow: hidden;
+  padding: 8px 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cellValue {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.headerCell {
+  background: #edf1f2;
+  border: 0;
+  color: #2c2c2e;
+  font-weight: 600;
+  height: 48px;
+  letter-spacing: 0.25px;
+  user-select: none;
+}
+
+.left { justify-content: flex-start; }
+.right { justify-content: flex-end; }
+.center { justify-content: center; }
+
+.indexCell {
+  align-items: center;
+  color: #87898c;
+  display: flex;
+  font-size: 11px;
+  flex: 40 0 auto;
+  justify-content: center;
+  width: 40px
+}
+
+div.headerIndexCell {
+  flex-grow: 0;
+}
+
+.draggingCell {
+  background: #e1e5e6;
+  border-radius: 5px;
+}

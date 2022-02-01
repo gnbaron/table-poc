@@ -1,5 +1,4 @@
 import React from "react"
-import clsx from "clsx"
 import {
   useTable,
   useFlexLayout,
@@ -7,13 +6,19 @@ import {
   useResizeColumns,
 } from "react-table"
 import { FixedSizeList as List } from "react-window"
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
-import { animation, Item, Menu, useContextMenu } from "react-contexify"
-import "react-contexify/dist/ReactContexify.css"
 import { useFakeData } from "./helpers/useFakeData"
-import { Checkmark } from "./Checkmark"
 import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
+import { Header } from "./Header"
+import {
+  BooleanCell,
+  Cell,
+  CurrencyCell,
+  DateCell,
+  HeaderCell,
+  IndexCell,
+} from "./Cell"
+import cellStyles from "./Cell.module.css"
 import styles from "./Table.module.css"
 
 const TOTAL_ROWS = 500
@@ -94,6 +99,13 @@ export const Table = () => {
     useResizeColumns
   )
 
+  const handleHideColumn = React.useCallback(
+    ({ props }) => {
+      if (props.columnId) toggleHideColumn(props.columnId)
+    },
+    [toggleHideColumn]
+  )
+
   const handleUpdateColumnOrder = React.useCallback(
     (headers, result) => {
       const from = result.source.index
@@ -109,38 +121,18 @@ export const Table = () => {
     [setColumnOrder]
   )
 
-  const { show } = useContextMenu({ id: HEADER_CONTEXT_MENU_ID })
-
-  const handleHeaderContextMenu = React.useCallback(
-    (event) => {
-      const columnHeader = event.target.closest("[data-column-id]")
-      show(event, { props: { columnId: columnHeader?.dataset.columnId } })
-    },
-    [show]
-  )
-
-  const handleHideColumn = React.useCallback(
-    ({ props }) => {
-      if (props.columnId) toggleHideColumn(props.columnId)
-    },
-    [toggleHideColumn]
-  )
+  const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
 
   const RowRenderer = React.useCallback(
     ({ index, style }) => {
       const row = rows[index]
       prepareRow(row)
       return (
-        <div
-          {...row.getRowProps({
-            style,
-          })}
-          className={styles.row}
-        >
-          <div className={clsx(styles.cell, styles.indexCell)}>{index + 1}</div>
+        <div {...row.getRowProps({ style })} className={styles.row}>
+          <IndexCell index={index} />
           {row.cells.map((cell) => {
             return (
-              <div {...cell.getCellProps()} className={styles.cell}>
+              <div {...cell.getCellProps()} className={cellStyles.cell}>
                 {cell.render("Cell")}
               </div>
             )
@@ -151,74 +143,13 @@ export const Table = () => {
     [prepareRow, rows]
   )
 
-  const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
-
   return (
     <div {...getTableProps()} className={styles.table}>
-      <div className={styles.header} onContextMenu={handleHeaderContextMenu}>
-        {headerGroups.map((headerGroup) => {
-          const headerGroupProps = headerGroup.getHeaderGroupProps()
-          return (
-            <DragDropContext
-              key={headerGroupProps.key}
-              onDragEnd={(result) =>
-                handleUpdateColumnOrder(headerGroup.headers, result)
-              }
-            >
-              <Droppable droppableId="droppable" direction="horizontal">
-                {(provided, droppableSnapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    {...headerGroup.getHeaderGroupProps()}
-                  >
-                    <div
-                      className={clsx(
-                        styles.cell,
-                        styles.headerCell,
-                        styles.indexCell,
-                        styles.headerIndexCell
-                      )}
-                    >
-                      #
-                    </div>
-                    {headerGroup.headers.map((column, index) => (
-                      <div
-                        key={column.id}
-                        className={styles.headerColumn}
-                        data-column-id={column.id}
-                      >
-                        <Draggable draggableId={column.id} index={index}>
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={provided.draggableProps.style}
-                            >
-                              {column.render("Header", {
-                                isDragging: snapshot.isDragging,
-                              })}
-                            </div>
-                          )}
-                        </Draggable>
-                        <div
-                          className={clsx(
-                            styles.resizer,
-                            droppableSnapshot.isDraggingOver && styles.hidden
-                          )}
-                          {...column.getResizerProps()}
-                        />
-                      </div>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )
-        })}
-      </div>
+      <Header
+        headerGroups={headerGroups}
+        onHideColumn={handleHideColumn}
+        onUpdateColumnOrder={handleUpdateColumnOrder}
+      />
       <div {...getTableBodyProps()}>
         <List
           height={850}
@@ -229,75 +160,6 @@ export const Table = () => {
           {RowRenderer}
         </List>
       </div>
-      <HeaderContextMenu onHideColumn={handleHideColumn} />
     </div>
   )
 }
-
-const HeaderCell = React.memo(({ align, ...props }) => {
-  return (
-    <div
-      className={clsx(
-        styles.cell,
-        styles.headerCell,
-        styles[align],
-        props.isDragging && styles.draggingCell
-      )}
-      {...props.column.getHeaderProps()}
-    >
-      {props.column.id}
-    </div>
-  )
-})
-HeaderCell.displayName = "HeaderCell"
-
-const Cell = React.memo(({ align, children }) => (
-  <div className={clsx(styles.cellValue, styles[align])}>{children}</div>
-))
-Cell.displayName = "Cell"
-
-const BooleanCell = React.memo(({ value }) =>
-  value !== undefined ? <Checkmark checked={value} /> : ""
-)
-BooleanCell.displayName = "BooleanCell"
-
-const CurrencyCell = React.memo(({ value }) =>
-  value
-    ? new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(value)
-    : ""
-)
-CurrencyCell.displayName = "CurrencyCell"
-
-const DateCell = React.memo(({ value }) =>
-  value ? value.toLocaleDateString() : ""
-)
-DateCell.displayName = "DateCell"
-
-const HEADER_CONTEXT_MENU_ID = "HEADER_CONTEXT_MENU"
-
-const HeaderContextMenu = ({ onHideColumn }) => (
-  <Menu
-    id={HEADER_CONTEXT_MENU_ID}
-    animation={{ enter: animation.fade, exit: false }}
-    theme="dark"
-  >
-    <Item className={styles.menuItem} onClick={onHideColumn}>
-      👀 <span>Hide column</span>
-    </Item>
-    <Item className={styles.menuItem}>
-      👈 <span>Insert left</span>
-    </Item>
-    <Item className={styles.menuItem}>
-      👉 <span>Insert right</span>
-    </Item>
-    <Item className={styles.menuItem}>
-      💬 <span>Add comment</span>
-    </Item>
-    <Item className={styles.menuItem}>
-      🗑 <span>Delete</span>
-    </Item>
-  </Menu>
-)
