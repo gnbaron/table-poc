@@ -157,7 +157,11 @@ export const Table = () => {
       return (
         <div
           {...row.getRowProps({ style })}
-          className={clsx(styles.row, row.isSelected && styles.selected)}
+          className={clsx(
+            styles.row,
+            index % 2 > 0 ? styles.odd : styles.even,
+            row.isSelected && styles.selected
+          )}
           onClick={(e) => {
             if (e.metaKey) row.toggleRowSelected()
           }}
