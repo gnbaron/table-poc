@@ -27,8 +27,8 @@ export const useFakeLazyData = () => {
   return { data, fetch, hasNext: true, loading }
 }
 
-// takes between 0-5s to run
-const fakeRequest = (callback) => setTimeout(callback, Math.random() * 5000)
+// takes between 0-3s to run
+const fakeRequest = (callback) => setTimeout(callback, Math.random() * 3000)
 
 const generateRows = (n) => new Array(n).fill(null).map(randomRow)
 

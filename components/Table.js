@@ -24,7 +24,7 @@ import { SkeletonLoader } from "./SkeletonLoader"
 import cellStyles from "./Cell.module.css"
 import styles from "./Table.module.css"
 
-const PAGE_SIZE = 50
+const PAGE_SIZE = 100
 
 export const Table = () => {
   const { data, fetch, hasNext, loading } = useFakeLazyData()
