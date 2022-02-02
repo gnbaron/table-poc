@@ -20,8 +20,9 @@ export const useFakeLazyData = ({ total }) => {
       setLoading(true)
       fakeRequest(() => {
         const rows = generateRows(pageSize)
-        const newData = pageIndex === 0 ? rows : (data) => [...data, ...rows]
-        setData(newData.slice(0, total))
+        setData(
+          pageIndex === 0 ? rows : (data) => [...data, ...rows].slice(0, total)
+        )
         setLoading(false)
       })
     },

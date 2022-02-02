@@ -11,9 +11,7 @@ export const Footer = ({ footerGroups }) => {
           <div key={footerGroupProps.key} {...footerGroupProps}>
             <HeaderIndexCell />
             {footerGroup.headers.map((column) => (
-              <div className={styles.footerColumn}>
-                {column.render("Footer")}
-              </div>
+              <div key={column.id}>{column.render("Footer")}</div>
             ))}
           </div>
         )
