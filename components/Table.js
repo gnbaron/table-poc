@@ -7,6 +7,7 @@ import {
   useResizeColumns,
   usePagination,
   useRowSelect,
+  useSortBy,
 } from "react-table"
 import { FixedSizeList as List } from "react-window"
 import InfiniteLoader from "react-window-infinite-loader"
@@ -112,7 +113,6 @@ export const Table = () => {
     getTableProps,
     headerGroups,
     footerGroups,
-    toggleHideColumn,
     prepareRow,
     rows,
     setColumnOrder,
@@ -132,18 +132,12 @@ export const Table = () => {
     useFlexLayout,
     useColumnOrder,
     useResizeColumns,
+    useSortBy,
     usePagination,
     useRowSelect
   )
 
   useEffect(() => fetch({ pageIndex, pageSize }), [fetch, pageIndex, pageSize])
-
-  const handleHideColumn = React.useCallback(
-    ({ props }) => {
-      if (props.columnId) toggleHideColumn(props.columnId)
-    },
-    [toggleHideColumn]
-  )
 
   const handleUpdateColumnOrder = React.useCallback(
     (headers, result) => {
@@ -205,7 +199,6 @@ export const Table = () => {
     <div {...getTableProps()} className={styles.table}>
       <Header
         headerGroups={headerGroups}
-        onHideColumn={handleHideColumn}
         onUpdateColumnOrder={handleUpdateColumnOrder}
       />
       <div {...getTableBodyProps()}>

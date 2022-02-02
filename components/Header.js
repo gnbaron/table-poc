@@ -5,73 +5,71 @@ import { HeaderContextMenu, useHeaderContextMenu } from "./HeaderContextMenu"
 import { HeaderIndexCell } from "./Cell"
 import styles from "./Header.module.css"
 
-export const Header = ({ headerGroups, onHideColumn, onUpdateColumnOrder }) => {
-  const { show } = useHeaderContextMenu()
+export const Header = ({ headerGroups, onUpdateColumnOrder }) => (
+  <div className={styles.header}>
+    {headerGroups.map((headerGroup) => {
+      const headerGroupProps = headerGroup.getHeaderGroupProps()
+      return (
+        <DragDropContext
+          key={headerGroupProps.key}
+          onDragEnd={(result) =>
+            onUpdateColumnOrder(headerGroup.headers, result)
+          }
+        >
+          <Droppable droppableId="droppable" direction="horizontal">
+            {(provided, droppableSnapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                {...headerGroupProps}
+              >
+                <HeaderIndexCell>#</HeaderIndexCell>
+                {headerGroup.headers.map((column, index) => (
+                  <HeaderColumn key={column.id} column={column}>
+                    <Draggable draggableId={column.id} index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={provided.draggableProps.style}
+                        >
+                          {column.render("Header", {
+                            isDragging: snapshot.isDragging,
+                          })}
+                        </div>
+                      )}
+                    </Draggable>
+                    <ColumnResizer
+                      isDraggingOver={droppableSnapshot.isDraggingOver}
+                      {...column.getResizerProps()}
+                    />
+                  </HeaderColumn>
+                ))}
+                {provided.placeholder}
+                <div className={styles.buttonWrapper}>
+                  <button className={styles.addButton}>+</button>
+                </div>
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      )
+    })}
+  </div>
+)
 
-  const handleHeaderContextMenu = React.useCallback(
-    (event) => {
-      const columnHeader = event.target.closest("[data-column-id]")
-      show(event, { props: { columnId: columnHeader?.dataset.columnId } })
-    },
-    [show]
-  )
+const HeaderColumn = ({ children, column }) => {
+  const { show } = useHeaderContextMenu(column.id)
 
   return (
-    <div className={styles.header} onContextMenu={handleHeaderContextMenu}>
-      {headerGroups.map((headerGroup) => {
-        const headerGroupProps = headerGroup.getHeaderGroupProps()
-        return (
-          <DragDropContext
-            key={headerGroupProps.key}
-            onDragEnd={(result) =>
-              onUpdateColumnOrder(headerGroup.headers, result)
-            }
-          >
-            <Droppable droppableId="droppable" direction="horizontal">
-              {(provided, droppableSnapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  {...headerGroupProps}
-                >
-                  <HeaderIndexCell>#</HeaderIndexCell>
-                  {headerGroup.headers.map((column, index) => (
-                    <div
-                      key={column.id}
-                      className={styles.headerColumn}
-                      data-column-id={column.id}
-                    >
-                      <Draggable draggableId={column.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={provided.draggableProps.style}
-                          >
-                            {column.render("Header", {
-                              isDragging: snapshot.isDragging,
-                            })}
-                          </div>
-                        )}
-                      </Draggable>
-                      <ColumnResizer
-                        isDraggingOver={droppableSnapshot.isDraggingOver}
-                        {...column.getResizerProps()}
-                      />
-                    </div>
-                  ))}
-                  {provided.placeholder}
-                  <div className={styles.buttonWrapper}>
-                    <button className={styles.addButton}>+</button>
-                  </div>
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )
-      })}
-      <HeaderContextMenu onHideColumn={onHideColumn} />
+    <div
+      className={styles.headerColumn}
+      data-column-id={column.id}
+      onContextMenu={show}
+    >
+      {children}
+      <HeaderContextMenu column={column} />
     </div>
   )
 }
