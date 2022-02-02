@@ -1,5 +1,6 @@
 .header {
   background: #edf1f2;
+  border-bottom: 1px solid #dbe4e6;
   display: flex;
   position: sticky;
   top: 0;

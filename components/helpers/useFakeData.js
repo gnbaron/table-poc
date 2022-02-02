@@ -11,20 +11,24 @@ export const useFakeData = ({ total }) => {
   return { data }
 }
 
-export const useFakeLazyData = () => {
+export const useFakeLazyData = ({ total }) => {
   const [loading, setLoading] = React.useState(true)
   const [data, setData] = React.useState([])
 
-  const fetch = useCallback(({ pageIndex, pageSize }) => {
-    setLoading(true)
-    fakeRequest(() => {
-      const newData = generateRows(pageSize)
-      setData(pageIndex === 0 ? newData : (data) => [...data, ...newData])
-      setLoading(false)
-    })
-  }, [])
+  const fetch = useCallback(
+    ({ pageIndex, pageSize }) => {
+      setLoading(true)
+      fakeRequest(() => {
+        const rows = generateRows(pageSize)
+        const newData = pageIndex === 0 ? rows : (data) => [...data, ...rows]
+        setData(newData.slice(0, total))
+        setLoading(false)
+      })
+    },
+    [total]
+  )
 
-  return { data, fetch, hasNext: true, loading }
+  return { data, fetch, hasNext: data.length < total, loading }
 }
 
 // takes between 0-3s to run

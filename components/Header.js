@@ -32,9 +32,9 @@ export const Header = ({ headerGroups, onHideColumn, onUpdateColumnOrder }) => {
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  {...headerGroup.getHeaderGroupProps()}
+                  {...headerGroupProps}
                 >
-                  <HeaderIndexCell />
+                  <HeaderIndexCell>#</HeaderIndexCell>
                   {headerGroup.headers.map((column, index) => (
                     <div
                       key={column.id}

@@ -14,31 +14,46 @@ import { useFakeLazyData } from "./helpers/useFakeData"
 import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
 import { Header } from "./Header"
+import { Footer } from "./Footer"
 import {
   BooleanCell,
   Cell,
   CurrencyCell,
   DateCell,
+  FooterCell,
   HeaderCell,
   IndexCell,
+  BooleanFooterCell,
+  SumFooterCell,
+  PageInfoFooterCell,
 } from "./Cell"
 import { SkeletonLoader } from "./SkeletonLoader"
 import cellStyles from "./Cell.module.css"
 import styles from "./Table.module.css"
 
+const TOTAL_ROWS = 2675
 const PAGE_SIZE = 100
 
 export const Table = () => {
-  const { data, fetch, hasNext, loading } = useFakeLazyData()
+  const { data, fetch, hasNext, loading } = useFakeLazyData({
+    total: TOTAL_ROWS,
+  })
 
   const defaultColumn = {
     Cell: (props) => <Cell align="left">{props.value}</Cell>,
+    Footer: (props) => <FooterCell align="left" {...props} />,
     Header: (props) => <HeaderCell align="left" {...props} />,
   }
 
   const columns = React.useMemo(
     () => [
-      { accessor: "Id", minWidth: 270 },
+      {
+        accessor: "Id",
+        minWidth: 270,
+        Footer: (props) => (
+          <PageInfoFooterCell align="left" total={TOTAL_ROWS} {...props} />
+        ),
+      },
       {
         accessor: "ARR",
         Cell: (props) => (
@@ -47,6 +62,7 @@ export const Table = () => {
           </Cell>
         ),
         Header: (props) => <HeaderCell align="right" {...props} />,
+        Footer: (props) => <SumFooterCell align="right" {...props} />,
         minWidth: 90,
         width: 100,
       },
@@ -58,6 +74,7 @@ export const Table = () => {
           </Cell>
         ),
         Header: (props) => <HeaderCell align="center" {...props} />,
+        Footer: (props) => <FooterCell align="center" {...props} />,
         minWidth: 110,
         width: 110,
       },
@@ -69,6 +86,7 @@ export const Table = () => {
           </Cell>
         ),
         Header: (props) => <HeaderCell align="center" {...props} />,
+        Footer: (props) => <FooterCell align="center" {...props} />,
         minWidth: 110,
         width: 110,
       },
@@ -80,6 +98,7 @@ export const Table = () => {
           </Cell>
         ),
         Header: (props) => <HeaderCell align="center" {...props} />,
+        Footer: (props) => <BooleanFooterCell align="center" {...props} />,
         minWidth: 100,
         width: 100,
       },
@@ -92,6 +111,7 @@ export const Table = () => {
     getTableBodyProps,
     getTableProps,
     headerGroups,
+    footerGroups,
     toggleHideColumn,
     prepareRow,
     rows,
@@ -141,7 +161,8 @@ export const Table = () => {
   )
 
   const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
-  const itemCount = !hasNext ? data.length : data.length + 25 // Skeleton loaders
+  const skeletonCount = !data.length ? 25 : 5
+  const itemCount = hasNext ? data.length + skeletonCount : data.length
   const isItemLoaded = React.useCallback((index) => index < data.length, [data])
   const width = totalColumnsWidth + scrollBarSize + 40 // Index cell
 
@@ -195,7 +216,7 @@ export const Table = () => {
         >
           {({ onItemsRendered, ref }) => (
             <List
-              height={850}
+              height={800}
               itemCount={itemCount}
               itemSize={40}
               onItemsRendered={onItemsRendered}
@@ -207,6 +228,7 @@ export const Table = () => {
           )}
         </InfiniteLoader>
       </div>
+      <Footer footerGroups={footerGroups} />
     </div>
   )
 }

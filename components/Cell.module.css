@@ -19,7 +19,8 @@
   width: 100%;
 }
 
-.headerCell {
+.headerCell,
+.footerCell {
   background: #edf1f2;
   border: 0;
   color: #2c2c2e;
@@ -29,9 +30,28 @@
   user-select: none;
 }
 
-.left { justify-content: flex-start; }
-.right { justify-content: flex-end; }
-.center { justify-content: center; }
+.footerCell {
+  background: #fff;
+  font-size: 11px;
+  font-weight: normal;
+}
+
+.footerCell .title {
+  color: #777d80;
+}
+
+.left {
+  justify-content: flex-start;
+  text-align: left;
+}
+.right {
+  justify-content: flex-end;
+  text-align: right;
+}
+.center {
+  justify-content: center;
+  text-align: center;
+}
 
 .indexCell {
   align-items: center;
@@ -40,11 +60,15 @@
   font-size: 11px;
   flex: 40 0 auto;
   justify-content: center;
-  width: 40px
+  width: 40px;
 }
 
 div.headerIndexCell {
   flex-grow: 0;
+  font-weight: 600;
+  height: 48px;
+  letter-spacing: 0.25px;
+  user-select: none;
 }
 
 .draggingCell {
