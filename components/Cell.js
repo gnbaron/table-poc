@@ -7,7 +7,7 @@ import styles from "./Cell.module.css"
 const format = (value) => value
 
 export const Cell = React.memo(
-  ({ formatEditingValue = format, formatValue = format, ...props }) => {
+  ({ editor, formatEditingValue = format, formatValue = format, ...props }) => {
     const [autoFocus, setAutoFocus] = useState(false)
     const [editing, setEditing] = useState(false)
 
@@ -37,7 +37,8 @@ export const Cell = React.memo(
       }
     }
 
-    const CellComponent = editing ? InputCell : CellNavigator
+    const EditorComponent = editor || InputCell
+    const CellComponent = editing ? EditorComponent : CellNavigator
 
     return (
       <CellComponent
@@ -70,7 +71,7 @@ export const IndexCell = React.memo(({ index }) => (
   </CellNavigator>
 ))
 
-export const BooleanCell = React.memo(({ ...props }) => (
+export const BooleanCell = React.memo((props) => (
   <Cell
     align="center"
     formatEditingValue={(value) => value.toLowerCase() === "true"}
@@ -81,7 +82,7 @@ export const BooleanCell = React.memo(({ ...props }) => (
   />
 ))
 
-export const CurrencyCell = React.memo(({ ...props }) => (
+export const CurrencyCell = React.memo((props) => (
   <Cell
     align="right"
     formatEditingValue={Number}
@@ -97,7 +98,7 @@ export const CurrencyCell = React.memo(({ ...props }) => (
   />
 ))
 
-export const DateCell = React.memo(({ ...props }) => (
+export const DateCell = React.memo((props) => (
   <Cell
     align="center"
     formatEditingValue={(value) => new Date(value)}
@@ -105,3 +106,43 @@ export const DateCell = React.memo(({ ...props }) => (
     {...props}
   />
 ))
+
+export const FakeFormulaCell = React.memo((props) => (
+  <Cell
+    align="right"
+    formatValue={() => Number(props.row.original["ARR"] * 0.15).toFixed(2)}
+    editor={FakeFormulaInput}
+    {...props}
+  />
+))
+
+const FakeFormulaInput = React.memo((props) => {
+  const elementRef = React.useRef()
+
+  React.useEffect(() => {
+    if (elementRef.current) {
+      elementRef.current.focus()
+
+      const range = document.createRange()
+      const selection = window.getSelection()
+
+      range.setStart(elementRef.current.childNodes[2], 6)
+      range.collapse(true)
+
+      selection.removeAllRanges()
+      selection.addRange(range)
+    }
+  }, [])
+
+  return (
+    <div
+      {...props}
+      contentEditable
+      className={clsx(styles.cell, styles.right, styles.fakeFormulaEditor)}
+      suppressContentEditableWarning
+      ref={elementRef}
+    >
+      = <span>ARR</span> * 15%
+    </div>
+  )
+})

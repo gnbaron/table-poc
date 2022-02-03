@@ -1,5 +1,5 @@
-import faker from "faker"
 import React, { useCallback } from "react"
+import faker from "faker"
 
 export const useFakeData = ({ total }) => {
   const [data, setData] = React.useState([])
@@ -43,5 +43,5 @@ const randomRow = () => ({
   CreatedAt: faker.date.recent(),
   CloseDate: faker.date.recent(),
   DealClosed: faker.datatype.boolean(),
-  Account_Name: faker.company.companyName(),
+  AccountName: faker.company.companyName(),
 })

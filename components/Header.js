@@ -5,7 +5,7 @@ import { HeaderContextMenu, useHeaderContextMenu } from "./HeaderContextMenu"
 import { HeaderIndexCell } from "./HeaderCell"
 import styles from "./Header.module.css"
 
-export const Header = ({ headerGroups, onUpdateColumnOrder }) => (
+export const Header = ({ headerGroups, onAddColumn, onUpdateColumnOrder }) => (
   <div className={styles.header}>
     {headerGroups.map((headerGroup) => {
       const headerGroupProps = headerGroup.getHeaderGroupProps()
@@ -48,7 +48,9 @@ export const Header = ({ headerGroups, onUpdateColumnOrder }) => (
                 ))}
                 {provided.placeholder}
                 <div className={styles.buttonWrapper}>
-                  <button className={styles.addButton}>+</button>
+                  <button className={styles.addButton} onClick={onAddColumn}>
+                    +
+                  </button>
                 </div>
               </div>
             )}

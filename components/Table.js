@@ -17,7 +17,14 @@ import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
 import { Header } from "./Header"
 import { Footer } from "./Footer"
-import { BooleanCell, Cell, CurrencyCell, DateCell, IndexCell } from "./Cell"
+import {
+  BooleanCell,
+  Cell,
+  CurrencyCell,
+  DateCell,
+  FakeFormulaCell,
+  IndexCell,
+} from "./Cell"
 import { HeaderCell } from "./HeaderCell"
 import {
   FooterCell,
@@ -46,51 +53,56 @@ export const Table = () => {
     Header: (props) => <HeaderCell align="left" {...props} />,
   }
 
-  const columns = React.useMemo(
-    () => [
-      {
-        accessor: "Id",
-        minWidth: 270,
-        Footer: (props) => (
-          <PageInfoFooterCell align="left" total={TOTAL_ROWS} {...props} />
-        ),
-      },
-      {
-        accessor: "ARR",
-        Cell: (props) => <CurrencyCell {...props} />,
-        Header: (props) => <HeaderCell align="right" {...props} />,
-        Footer: (props) => <SumFooterCell align="right" {...props} />,
-        minWidth: 90,
-        width: 100,
-      },
-      {
-        accessor: "CloseDate",
-        Cell: (props) => <DateCell {...props} />,
-        Header: (props) => <HeaderCell align="center" {...props} />,
-        Footer: (props) => <FooterCell align="center" {...props} />,
-        minWidth: 110,
-        width: 110,
-      },
-      {
-        accessor: "CreatedAt",
-        Cell: (props) => <DateCell {...props} />,
-        Header: (props) => <HeaderCell align="center" {...props} />,
-        Footer: (props) => <FooterCell align="center" {...props} />,
-        minWidth: 110,
-        width: 110,
-      },
-      {
-        accessor: "DealClosed",
-        Cell: (props) => <BooleanCell {...props} />,
-        Header: (props) => <HeaderCell align="center" {...props} />,
-        Footer: (props) => <BooleanFooterCell align="center" {...props} />,
-        minWidth: 100,
-        width: 100,
-      },
-      { accessor: "Account_Name", width: 225, minWidth: 150 },
-    ],
-    []
-  )
+  const [columns, setColumns] = React.useState([
+    {
+      accessor: "Id",
+      minWidth: 270,
+      Footer: (props) => (
+        <PageInfoFooterCell align="left" total={TOTAL_ROWS} {...props} />
+      ),
+    },
+    {
+      accessor: "ARR",
+      Cell: (props) => <CurrencyCell {...props} />,
+      Header: (props) => <HeaderCell align="right" {...props} />,
+      Footer: (props) => <SumFooterCell align="right" {...props} />,
+      minWidth: 90,
+      width: 100,
+    },
+    {
+      accessor: "CloseDate",
+      Cell: (props) => <DateCell {...props} />,
+      Header: (props) => <HeaderCell align="center" {...props} />,
+      Footer: (props) => <FooterCell align="center" {...props} />,
+      minWidth: 110,
+      width: 110,
+    },
+    {
+      accessor: "CreatedAt",
+      Cell: (props) => <DateCell {...props} />,
+      Header: (props) => <HeaderCell align="center" {...props} />,
+      Footer: (props) => <FooterCell align="center" {...props} />,
+      minWidth: 110,
+      width: 110,
+    },
+    {
+      accessor: "DealClosed",
+      Cell: (props) => <BooleanCell {...props} />,
+      Header: (props) => <HeaderCell align="center" {...props} />,
+      Footer: (props) => <BooleanFooterCell align="center" {...props} />,
+      minWidth: 100,
+      width: 100,
+    },
+    { accessor: "AccountName", width: 225, minWidth: 150 },
+  ])
+
+  const handleAddColumn = React.useCallback(() => {
+    const newColumn = {
+      id: `Column${columns.length + 1}`,
+      Cell: (props) => <FakeFormulaCell {...props} />,
+    }
+    setColumns((columns) => [...columns, newColumn])
+  }, [columns])
 
   const {
     getTableBodyProps,
@@ -185,6 +197,7 @@ export const Table = () => {
     <div {...getTableProps()} className={styles.table}>
       <Header
         headerGroups={headerGroups}
+        onAddColumn={handleAddColumn}
         onUpdateColumnOrder={handleUpdateColumnOrder}
       />
       <div {...getTableBodyProps()}>

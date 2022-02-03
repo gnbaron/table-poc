@@ -93,3 +93,14 @@ input.cell:focus-visible {
   background: #e1e5e6;
   border-radius: 5px;
 }
+
+.fakeFormulaEditor {
+  background: #f1f3f4;
+  border: 1px solid #d2d2d2;
+  border-radius: 5px;
+  padding: 8px 16px 8px 6px;
+}
+
+.fakeFormulaEditor span {
+  color: #ed9512;
+}
