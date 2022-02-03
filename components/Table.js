@@ -16,6 +16,7 @@ import { useCellOverwrite } from "./helpers/useCellOverwrite"
 import { useFakeLazyData } from "./helpers/useFakeData"
 import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
+import { useHighlightColumn } from "./plugins/useHighlightColumn"
 import { Header } from "./Header"
 import { Footer } from "./Footer"
 import {
@@ -139,7 +140,8 @@ export const Table = () => {
     useGlobalFilter,
     useSortBy,
     usePagination,
-    useRowSelect
+    useRowSelect,
+    useHighlightColumn
   )
 
   useEffect(() => fetch({ pageIndex, pageSize }), [fetch, pageIndex, pageSize])
