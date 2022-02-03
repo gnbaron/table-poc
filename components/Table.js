@@ -33,7 +33,7 @@ import {
   SumFooterCell,
   PageInfoFooterCell,
 } from "./FooterCell"
-import { GlobalFilter } from "./GlobalFilter"
+import { Toolbar } from "./Toolbar"
 import { SkeletonLoader } from "./SkeletonLoader"
 import styles from "./Table.module.css"
 
@@ -202,7 +202,7 @@ export const Table = () => {
   return (
     <div {...getTableProps()} className={styles.table}>
       <div className={styles.toolbar}>
-        <GlobalFilter
+        <Toolbar
           globalFilter={globalFilter}
           setGlobalFilter={setGlobalFilter}
         />

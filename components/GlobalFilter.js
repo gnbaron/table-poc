@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { useAsyncDebounce } from "react-table"
+import { IoIosSearch } from "react-icons/io"
 import styles from "./GlobalFilter.module.css"
 
 export const GlobalFilter = ({ globalFilter, setGlobalFilter }) => {
@@ -11,16 +12,7 @@ export const GlobalFilter = ({ globalFilter, setGlobalFilter }) => {
 
   return (
     <div className={styles.globalFilter}>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        className={styles.icon}
-      >
-        <path
-          fill="currentColor"
-          d="M16.32 14.906l5.387 5.387-1.414 1.414-5.387-5.387a8 8 0 111.414-1.414zM10 16a6 6 0 100-12 6 6 0 000 12z"
-        ></path>
-      </svg>
+      <IoIosSearch className={styles.icon} />
       <input
         className={styles.searchInput}
         onChange={(e) => {

@@ -1,5 +1,14 @@
 import React from "react"
 import { animation, Item, Menu, useContextMenu } from "react-contexify"
+import { BiCommentAdd } from "react-icons/bi"
+import { IoEyeOffOutline, IoFilter } from "react-icons/io5"
+import {
+  RiDeleteBinLine,
+  RiInsertColumnLeft,
+  RiInsertColumnRight,
+  RiSortAsc,
+  RiSortDesc,
+} from "react-icons/ri"
 import "react-contexify/dist/ReactContexify.css"
 import styles from "./HeaderContextMenu.module.css"
 
@@ -27,25 +36,28 @@ export const HeaderContextMenu = ({ column }) => {
       theme="dark"
     >
       <Item className={styles.menuItem} onClick={() => column.toggleHidden()}>
-        👀 <span>Hide column</span>
+        <IoEyeOffOutline /> <span>Hide column</span>
       </Item>
       <Item className={styles.menuItem}>
-        👈 <span>Insert left</span>
+        <RiInsertColumnLeft /> <span>Insert left</span>
       </Item>
       <Item className={styles.menuItem}>
-        👉 <span>Insert right</span>
+        <RiInsertColumnRight /> <span>Insert right</span>
       </Item>
       <Item className={styles.menuItem}>
-        💬 <span>Add comment</span>
+        <BiCommentAdd /> <span>Add comment</span>
+      </Item>
+      <Item className={styles.menuItem} onClick={() => column.setFilter("")}>
+        <IoFilter /> <span>Filter</span>
       </Item>
       <Item className={styles.menuItem} onClick={() => handleSortBy()}>
-        🔼 <span>Sort A to Z</span>
+        <RiSortAsc /> <span>Sort A to Z</span>
       </Item>
       <Item className={styles.menuItem} onClick={() => handleSortBy(true)}>
-        🔽 <span>Sort Z to A</span>
+        <RiSortDesc /> <span>Sort Z to A</span>
       </Item>
       <Item className={styles.menuItem}>
-        🗑 <span>Delete</span>
+        <RiDeleteBinLine /> <span>Delete</span>
       </Item>
     </Menu>
   )
