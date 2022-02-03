@@ -9,6 +9,7 @@
 }
 
 .searchInput {
+  background: #edf1f2;
   border: none;
   border-radius: 16px;
   cursor: pointer;
@@ -22,6 +23,7 @@
 }
 
 .searchInput:focus {
+  background: #fff;
   outline: none;
   box-shadow: 0 0 0 2px rgba(84, 92, 255, 0.75);
 }

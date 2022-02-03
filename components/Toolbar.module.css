@@ -5,3 +5,16 @@
   display: flex;
   padding: 8px 12px;
 }
+
+.button {
+  background: #edf1f2;
+  border: 0;
+  border-radius: 4px;
+  color: #2b363b;
+  cursor: pointer;
+  font-family: Montserrat, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 10px;
+  padding: 5px 8px;
+}

@@ -111,12 +111,14 @@ export const Table = () => {
     getTableProps,
     headerGroups,
     footerGroups,
+    toggleHideAllColumns,
     prepareRow,
     rows,
+    allColumns,
     setColumnOrder,
     totalColumnsWidth,
     nextPage,
-    state: { globalFilter, pageIndex, pageSize },
+    state: { globalFilter, hiddenColumns, pageIndex, pageSize, sortBy },
     setGlobalFilter,
   } = useTable(
     {
@@ -203,8 +205,12 @@ export const Table = () => {
     <div {...getTableProps()} className={styles.table}>
       <div className={styles.toolbar}>
         <Toolbar
+          columns={allColumns}
+          hiddenColumns={hiddenColumns}
           globalFilter={globalFilter}
+          onShowAllColumns={() => toggleHideAllColumns(false)}
           setGlobalFilter={setGlobalFilter}
+          sortBy={sortBy}
         />
       </div>
       <Header

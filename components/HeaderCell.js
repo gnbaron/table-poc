@@ -1,6 +1,5 @@
 import React from "react"
 import clsx from "clsx"
-import { SortedBy } from "./SortedBy"
 import styles from "./Cell.module.css"
 
 export const HeaderCell = React.memo(({ align, ...props }) => (
@@ -14,7 +13,6 @@ export const HeaderCell = React.memo(({ align, ...props }) => (
     {...props.column.getHeaderProps()}
   >
     {props.column.id}
-    <SortedBy column={props.column} />
   </div>
 ))
 
