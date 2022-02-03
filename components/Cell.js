@@ -1,119 +1,107 @@
-import React from "react"
+import React, { useState } from "react"
 import clsx from "clsx"
 import { Checkmark } from "./Checkmark"
-import { SortedBy } from "./SortedBy"
+import { CellNavigator } from "./CellNavigator"
 import styles from "./Cell.module.css"
 
-export const Cell = React.memo(({ align, children }) => (
-  <div className={clsx(styles.cellValue, styles[align])}>{children}</div>
-))
+const format = (value) => value
+
+export const Cell = React.memo(
+  ({ formatEditingValue = format, formatValue = format, ...props }) => {
+    const [autoFocus, setAutoFocus] = useState(false)
+    const [editing, setEditing] = useState(false)
+
+    const overwrite = props.getCellOverwrite(props.row.id, props.column.id)
+    const cellIndex = [
+      props.row.index + 1,
+      props.allColumns.findIndex((c) => c.id === props.column.id) + 1,
+    ]
+
+    const toggleEditing = (value, autoFocus = false) => {
+      setEditing(value)
+      setAutoFocus(autoFocus)
+    }
+
+    const updateCell = (e, autoFocus = false) => {
+      const overwrite = formatEditingValue(e.target.value)
+      props.setCellOverwrite(props.row.id, props.column.id, overwrite)
+      toggleEditing(false, autoFocus)
+    }
+
+    const handleKeyDown = (e) => {
+      if (editing) {
+        e.key === "Escape" && toggleEditing(false, true)
+        e.key === "Enter" && updateCell(e, true)
+      } else {
+        e.key === "Enter" && toggleEditing(true, true)
+      }
+    }
+
+    const CellComponent = editing ? InputCell : CellNavigator
+
+    return (
+      <CellComponent
+        autoFocus={autoFocus}
+        className={clsx(styles.cell, styles.cellValue, styles[props.align])}
+        data-index={cellIndex.join("-")}
+        onBlur={editing ? updateCell : undefined}
+        onDoubleClick={() => toggleEditing(true, true)}
+        onKeyDown={handleKeyDown}
+        {...props.cell.getCellProps()}
+      >
+        {formatValue(overwrite ?? props.value, editing)}
+      </CellComponent>
+    )
+  }
+)
+
+const InputCell = React.memo(({ children: initialValue, ...props }) => {
+  const [value, setValue] = useState(initialValue)
+  const handleChange = (e) => setValue(e.target.value)
+  return <input {...props} onChange={handleChange} value={value} />
+})
 
 export const IndexCell = React.memo(({ index }) => (
-  <div className={clsx(styles.cell, styles.indexCell)}>{index + 1}</div>
+  <CellNavigator
+    className={clsx(styles.cell, styles.indexCell)}
+    data-index={`${index + 1}-0`}
+  >
+    {index + 1}
+  </CellNavigator>
 ))
 
-export const HeaderCell = React.memo(({ align, ...props }) => {
-  return (
-    <div
-      className={clsx(
-        styles.cell,
-        styles.headerCell,
-        styles[align],
-        props.isDragging && styles.draggingCell
-      )}
-      {...props.column.getHeaderProps()}
-    >
-      {props.column.id}
-      <SortedBy column={props.column} />
-    </div>
-  )
-})
-
-export const HeaderIndexCell = React.memo(({ children }) => (
-  <div className={clsx(styles.cell, styles.indexCell, styles.headerIndexCell)}>
-    {children}
-  </div>
+export const BooleanCell = React.memo(({ ...props }) => (
+  <Cell
+    align="center"
+    formatEditingValue={(value) => value.toLowerCase() === "true"}
+    formatValue={(value = false, editing) =>
+      editing ? String(value) : <Checkmark checked={value} />
+    }
+    {...props}
+  />
 ))
 
-export const FooterCell = React.memo(({ align, ...props }) => {
-  return (
-    <div
-      className={clsx(styles.cell, styles.footerCell, styles[align])}
-      {...props.column.getFooterProps()}
-    >
-      <div>{props.children}</div>
-    </div>
-  )
-})
+export const CurrencyCell = React.memo(({ ...props }) => (
+  <Cell
+    align="right"
+    formatEditingValue={Number}
+    formatValue={(value, editing) =>
+      !editing
+        ? new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(value)
+        : value || 0
+    }
+    {...props}
+  />
+))
 
-export const PageInfoFooterCell = React.memo(({ total, ...props }) => {
-  return (
-    <FooterCell {...props}>
-      <div className={styles.title}>1-{props.rows.length} shown of</div>
-      {total} rows
-    </FooterCell>
-  )
-})
-
-export const SumFooterCell = React.memo((props) => {
-  const total = React.useMemo(
-    () =>
-      props.rows.reduce(
-        (sum, row) => Number(row.values[props.column.id]) + sum,
-        0
-      ),
-    [props.rows, props.column.id]
-  )
-
-  return (
-    <FooterCell {...props}>
-      <div className={styles.title}>Sum</div>${total.toFixed(2)}
-    </FooterCell>
-  )
-})
-
-export const BooleanFooterCell = React.memo((props) => {
-  const count = React.useMemo(
-    () =>
-      props.rows.reduce(
-        (count, row) => count + (row.values[props.column.id] ? 1 : 0),
-        0
-      ),
-    [props.rows, props.column.id]
-  )
-
-  return (
-    <FooterCell {...props}>
-      <div className={styles.title}>Count</div>
-      {count}
-    </FooterCell>
-  )
-})
-
-export const BooleanCell = React.memo(({ value }) =>
-  value !== undefined ? <Checkmark checked={value} /> : ""
-)
-
-export const CurrencyCell = React.memo(({ value }) =>
-  value
-    ? new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(value)
-    : ""
-)
-export const DateCell = React.memo(({ value }) =>
-  value ? value.toLocaleDateString() : ""
-)
-
-Cell.displayName = "Cell"
-IndexCell.displayName = "IndexCell"
-HeaderCell.displayName = "HeaderCell"
-HeaderIndexCell.displayName = "HeaderIndexCell"
-FooterCell.displayName = "FooterCell"
-PageInfoFooterCell.displayName = "PageInfoFooterCell"
-SumFooterCell.displayName = "SumFooterCell"
-BooleanFooterCell.displayName = "BooleanFooterCell"
-BooleanCell.displayName = "BooleanCell"
-CurrencyCell.displayName = "CurrencyCell"
-DateCell.displayName = "DateCell"
+export const DateCell = React.memo(({ ...props }) => (
+  <Cell
+    align="center"
+    formatEditingValue={(value) => new Date(value)}
+    formatValue={(value) => (value ? value.toLocaleDateString() : "")}
+    {...props}
+  />
+))

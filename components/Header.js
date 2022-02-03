@@ -2,7 +2,7 @@ import React from "react"
 import clsx from "clsx"
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
 import { HeaderContextMenu, useHeaderContextMenu } from "./HeaderContextMenu"
-import { HeaderIndexCell } from "./Cell"
+import { HeaderIndexCell } from "./HeaderCell"
 import styles from "./Header.module.css"
 
 export const Header = ({ headerGroups, onUpdateColumnOrder }) => (
@@ -23,7 +23,7 @@ export const Header = ({ headerGroups, onUpdateColumnOrder }) => (
                 {...provided.droppableProps}
                 {...headerGroupProps}
               >
-                <HeaderIndexCell>#</HeaderIndexCell>
+                <HeaderIndexCell />
                 {headerGroup.headers.map((column, index) => (
                   <HeaderColumn key={column.id} column={column}>
                     <Draggable draggableId={column.id} index={index}>
@@ -74,7 +74,7 @@ const HeaderColumn = ({ children, column }) => {
   )
 }
 
-const ColumnResizer = ({ isDraggingOver, ...props }) => (
+export const ColumnResizer = ({ isDraggingOver, ...props }) => (
   <div
     className={clsx(styles.resizer, isDraggingOver && styles.hidden)}
     {...props}

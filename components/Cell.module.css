@@ -1,15 +1,32 @@
 .cell {
   align-items: center;
+  background: none;
+  border: 0;
   color: #3f464f;
+  cursor: pointer;
   display: flex;
   flex-wrap: wrap;
+  font-family: Montserrat, sans-serif;
   font-size: 12px;
   font-weight: 500;
   height: 40px;
   overflow: hidden;
   padding: 8px 14px;
+  position: relative;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.cell:focus {
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px #545cff;
+  outline: none;
+}
+
+input.cell:focus-visible {
+  background: #fff;
+  box-shadow: inset 0 0 0 2px #545cff, 0px 0px 6px 1px rgb(0, 0, 0, 0.25);
+  z-index: 1;
 }
 
 .cellValue {
@@ -63,7 +80,8 @@
   width: 40px;
 }
 
-div.headerIndexCell {
+.headerIndexCell,
+.footerIndexCell {
   flex-grow: 0;
   font-weight: 600;
   height: 48px;

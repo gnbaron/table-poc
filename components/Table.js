@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { Fragment, useEffect } from "react"
 import clsx from "clsx"
 import {
   useTable,
@@ -11,25 +11,21 @@ import {
 } from "react-table"
 import { FixedSizeList as List } from "react-window"
 import InfiniteLoader from "react-window-infinite-loader"
+import { useCellOverwrite } from "./helpers/useCellOverwrite"
 import { useFakeLazyData } from "./helpers/useFakeData"
 import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
 import { Header } from "./Header"
 import { Footer } from "./Footer"
+import { BooleanCell, Cell, CurrencyCell, DateCell, IndexCell } from "./Cell"
+import { HeaderCell } from "./HeaderCell"
 import {
-  BooleanCell,
-  Cell,
-  CurrencyCell,
-  DateCell,
   FooterCell,
-  HeaderCell,
-  IndexCell,
   BooleanFooterCell,
   SumFooterCell,
   PageInfoFooterCell,
-} from "./Cell"
+} from "./FooterCell"
 import { SkeletonLoader } from "./SkeletonLoader"
-import cellStyles from "./Cell.module.css"
 import styles from "./Table.module.css"
 
 const TOTAL_ROWS = 2675
@@ -41,7 +37,11 @@ export const Table = () => {
   })
 
   const defaultColumn = {
-    Cell: (props) => <Cell align="left">{props.value}</Cell>,
+    Cell: (props) => (
+      <Cell align="left" {...props}>
+        {props.value}
+      </Cell>
+    ),
     Footer: (props) => <FooterCell align="left" {...props} />,
     Header: (props) => <HeaderCell align="left" {...props} />,
   }
@@ -57,11 +57,7 @@ export const Table = () => {
       },
       {
         accessor: "ARR",
-        Cell: (props) => (
-          <Cell align="right">
-            <CurrencyCell {...props} />
-          </Cell>
-        ),
+        Cell: (props) => <CurrencyCell {...props} />,
         Header: (props) => <HeaderCell align="right" {...props} />,
         Footer: (props) => <SumFooterCell align="right" {...props} />,
         minWidth: 90,
@@ -69,11 +65,7 @@ export const Table = () => {
       },
       {
         accessor: "CloseDate",
-        Cell: (props) => (
-          <Cell align="center">
-            <DateCell {...props} />
-          </Cell>
-        ),
+        Cell: (props) => <DateCell {...props} />,
         Header: (props) => <HeaderCell align="center" {...props} />,
         Footer: (props) => <FooterCell align="center" {...props} />,
         minWidth: 110,
@@ -81,11 +73,7 @@ export const Table = () => {
       },
       {
         accessor: "CreatedAt",
-        Cell: (props) => (
-          <Cell align="center">
-            <DateCell {...props} />
-          </Cell>
-        ),
+        Cell: (props) => <DateCell {...props} />,
         Header: (props) => <HeaderCell align="center" {...props} />,
         Footer: (props) => <FooterCell align="center" {...props} />,
         minWidth: 110,
@@ -93,11 +81,7 @@ export const Table = () => {
       },
       {
         accessor: "DealClosed",
-        Cell: (props) => (
-          <Cell align="center">
-            <BooleanCell {...props} />
-          </Cell>
-        ),
+        Cell: (props) => <BooleanCell {...props} />,
         Header: (props) => <HeaderCell align="center" {...props} />,
         Footer: (props) => <BooleanFooterCell align="center" {...props} />,
         minWidth: 100,
@@ -122,12 +106,14 @@ export const Table = () => {
   } = useTable(
     {
       autoResetSelectedRows: false,
+      autoResetSortBy: false,
       columns,
       data,
       defaultColumn,
       initialState: { pageIndex: 0, pageSize: PAGE_SIZE },
       manualPagination: true,
       pageCount: -1,
+      ...useCellOverwrite(),
     },
     useFlexLayout,
     useColumnOrder,
@@ -184,9 +170,9 @@ export const Table = () => {
           <IndexCell index={index} />
           {row.cells.map((cell) => {
             return (
-              <div {...cell.getCellProps()} className={cellStyles.cell}>
+              <Fragment key={cell.getCellProps().key}>
                 {cell.render("Cell")}
-              </div>
+              </Fragment>
             )
           })}
         </div>
