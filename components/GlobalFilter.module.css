@@ -9,7 +9,7 @@
 }
 
 .searchInput {
-  background: #edf1f2;
+  background-color: #edf1f2;
   border: none;
   border-radius: 16px;
   cursor: pointer;
@@ -18,12 +18,12 @@
   letter-spacing: 0.25px;
   margin-left: 8px;
   padding: 6px 10px;
-  transition: 200ms box-shadow;
+  transition: 200ms box-shadow, 200ms background-color;
   width: 250px;
 }
 
 .searchInput:focus {
-  background: #fff;
+  background-color: #fff;
   outline: none;
   box-shadow: 0 0 0 2px rgba(84, 92, 255, 0.75);
 }
