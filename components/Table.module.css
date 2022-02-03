@@ -8,6 +8,14 @@
   overflow: auto;
 }
 
+.toolbar {
+  align-items: center;
+  background: white;
+  color: #3f464f;
+  display: flex;
+  padding: 8px 12px;
+}
+
 .row {
   align-items: center;
   cursor: pointer;

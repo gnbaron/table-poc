@@ -8,6 +8,7 @@ import {
   usePagination,
   useRowSelect,
   useSortBy,
+  useGlobalFilter,
 } from "react-table"
 import { FixedSizeList as List } from "react-window"
 import InfiniteLoader from "react-window-infinite-loader"
@@ -25,6 +26,7 @@ import {
   SumFooterCell,
   PageInfoFooterCell,
 } from "./FooterCell"
+import { GlobalFilter } from "./GlobalFilter"
 import { SkeletonLoader } from "./SkeletonLoader"
 import styles from "./Table.module.css"
 
@@ -102,10 +104,12 @@ export const Table = () => {
     setColumnOrder,
     totalColumnsWidth,
     nextPage,
-    state: { pageIndex, pageSize },
+    state: { globalFilter, pageIndex, pageSize },
+    setGlobalFilter,
   } = useTable(
     {
       autoResetSelectedRows: false,
+      autoResetPage: false,
       autoResetSortBy: false,
       columns,
       data,
@@ -118,6 +122,7 @@ export const Table = () => {
     useFlexLayout,
     useColumnOrder,
     useResizeColumns,
+    useGlobalFilter,
     useSortBy,
     usePagination,
     useRowSelect
@@ -141,9 +146,10 @@ export const Table = () => {
   )
 
   const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
+  const canNextPage = hasNext && !globalFilter
   const skeletonCount = !data.length ? 25 : 5
-  const itemCount = hasNext ? data.length + skeletonCount : data.length
-  const isItemLoaded = React.useCallback((index) => index < data.length, [data])
+  const itemCount = canNextPage ? data.length + skeletonCount : rows.length
+  const isItemLoaded = React.useCallback((index) => index < rows.length, [rows])
   const width = totalColumnsWidth + scrollBarSize + 40 // Index cell
 
   const RowRenderer = React.useCallback(
@@ -183,19 +189,25 @@ export const Table = () => {
 
   return (
     <div {...getTableProps()} className={styles.table}>
+      <div className={styles.toolbar}>
+        <GlobalFilter
+          globalFilter={globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </div>
       <Header
         headerGroups={headerGroups}
         onUpdateColumnOrder={handleUpdateColumnOrder}
       />
       <div {...getTableBodyProps()}>
         <InfiniteLoader
-          loadMoreItems={loading ? () => {} : nextPage}
+          loadMoreItems={loading || !canNextPage ? () => {} : nextPage}
           isItemLoaded={isItemLoaded}
           itemCount={itemCount}
         >
           {({ onItemsRendered, ref }) => (
             <List
-              height={800}
+              height={700}
               itemCount={itemCount}
               itemSize={40}
               onItemsRendered={onItemsRendered}

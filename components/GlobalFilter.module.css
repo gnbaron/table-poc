@@ -1,0 +1,27 @@
+.globalFilter {
+  align-items: center;
+  display: flex;
+}
+
+.icon {
+  height: 1rem;
+  width: 1rem;
+}
+
+.searchInput {
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: Montserrat, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.25px;
+  margin-left: 8px;
+  padding: 6px 10px;
+  transition: 200ms box-shadow;
+  width: 250px;
+}
+
+.searchInput:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(84, 92, 255, 0.75);
+}
