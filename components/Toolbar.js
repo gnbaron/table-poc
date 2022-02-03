@@ -27,6 +27,7 @@ export const Toolbar = ({
         return (
           <button
             className={styles.button}
+            key={sort.id}
             onClick={() => column.clearSortBy()}
           >
             <strong>Sorted by</strong> {sort.id} <SortedBy desc={sort.desc} />

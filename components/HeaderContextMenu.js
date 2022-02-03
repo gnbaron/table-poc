@@ -47,7 +47,7 @@ export const HeaderContextMenu = ({ column }) => {
       <Item className={styles.menuItem}>
         <BiCommentAdd /> <span>Add comment</span>
       </Item>
-      <Item className={styles.menuItem} onClick={() => column.setFilter("")}>
+      <Item className={styles.menuItem}>
         <IoFilter /> <span>Filter</span>
       </Item>
       <Item className={styles.menuItem} onClick={() => handleSortBy()}>
