@@ -24,24 +24,30 @@ export const Header = ({ headerGroups, onAddColumn, onUpdateColumnOrder }) => (
               >
                 {headerGroup.headers.map((column, index) => (
                   <HeaderColumn key={column.id} column={column}>
-                    <Draggable draggableId={column.id} index={index}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={provided.draggableProps.style}
-                        >
-                          {column.render("Header", {
-                            isDragging: snapshot.isDragging,
-                          })}
-                        </div>
-                      )}
-                    </Draggable>
-                    <ColumnResizer
-                      isDraggingOver={droppableSnapshot.isDraggingOver}
-                      {...column.getResizerProps()}
-                    />
+                    {column.pinned ? (
+                      column.render("Header")
+                    ) : (
+                      <Draggable draggableId={column.id} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={provided.draggableProps.style}
+                          >
+                            {column.render("Header", {
+                              isDragging: snapshot.isDragging,
+                            })}
+                          </div>
+                        )}
+                      </Draggable>
+                    )}
+                    {column.resizable && (
+                      <ColumnResizer
+                        isDraggingOver={droppableSnapshot.isDraggingOver}
+                        {...column.getResizerProps()}
+                      />
+                    )}
                   </HeaderColumn>
                 ))}
                 {provided.placeholder}

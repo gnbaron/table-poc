@@ -57,6 +57,7 @@ export const Table = () => {
     ),
     Footer: (props) => <FooterCell align="left" {...props} />,
     Header: (props) => <HeaderCell align="left" {...props} />,
+    resizable: true,
   }
 
   const [columns, setColumns] = React.useState([
@@ -66,6 +67,8 @@ export const Table = () => {
       Cell: IndexCell,
       Header: HeaderIndexCell,
       Footer: FooterIndexCell,
+      resizable: false,
+      pinned: true,
     },
     {
       accessor: "Id",
