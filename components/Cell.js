@@ -107,33 +107,46 @@ export const FakeFormulaCell = React.memo((props) => (
   />
 ))
 
-const FakeFormulaInput = React.memo(({ cell }) => {
-  const elementRef = React.useRef()
+const FakeFormulaInput = React.memo(
+  ({ cell, highlightColumn, isColumnHighlighted, resetColumnHighlight }) => {
+    const elementRef = React.useRef()
 
-  React.useEffect(() => {
-    if (elementRef.current) {
-      elementRef.current.focus()
+    React.useEffect(() => {
+      if (elementRef.current) {
+        elementRef.current.focus()
 
-      const range = document.createRange()
-      const selection = window.getSelection()
+        const range = document.createRange()
+        const selection = window.getSelection()
 
-      range.setStart(elementRef.current.childNodes[2], 6)
-      range.collapse(true)
+        range.setStart(elementRef.current.childNodes[2], 6)
+        range.collapse(true)
 
-      selection.removeAllRanges()
-      selection.addRange(range)
-    }
-  }, [])
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
+    }, [])
 
-  return (
-    <div
-      {...cell.getCellProps()}
-      contentEditable
-      className={clsx(styles.cell, styles.right, styles.fakeFormulaEditor)}
-      suppressContentEditableWarning
-      ref={elementRef}
-    >
-      = <span>ARR</span> * 15%
-    </div>
-  )
-})
+    React.useEffect(() => {
+      if (!isColumnHighlighted("ARR")) {
+        highlightColumn("ARR")
+      }
+      return () => {
+        if (isColumnHighlighted("ARR")) {
+          resetColumnHighlight()
+        }
+      }
+    }, [highlightColumn, isColumnHighlighted, resetColumnHighlight])
+
+    return (
+      <div
+        {...cell.getCellProps()}
+        contentEditable
+        className={clsx(styles.cell, styles.right, styles.fakeFormulaEditor)}
+        suppressContentEditableWarning
+        ref={elementRef}
+      >
+        = <span>ARR</span> * 15%
+      </div>
+    )
+  }
+)
