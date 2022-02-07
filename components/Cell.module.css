@@ -20,6 +20,7 @@
 .cell.selected {
   background: rgb(84, 92, 255, 0.2);
   border-radius: 2px;
+  user-select: none;
 }
 
 .cell:focus {

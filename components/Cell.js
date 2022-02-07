@@ -51,7 +51,11 @@ const InputCell = React.memo(({ cell, className, onChange, value }) => (
 
 export const IndexCell = React.memo(({ cell, row }) => (
   <button
-    className={clsx(styles.cell, styles.indexCell)}
+    className={clsx(
+      styles.cell,
+      styles.indexCell,
+      cell.isSelected && styles.selected
+    )}
     {...cell.getCellProps()}
   >
     {row.index + 1}
