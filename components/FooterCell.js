@@ -13,9 +13,10 @@ export const FooterCell = React.memo(({ align, ...props }) => {
   )
 })
 
-export const FooterIndexCell = React.memo(() => (
+export const FooterIndexCell = React.memo((props) => (
   <div
     className={clsx(styles.cell, styles.indexCell, styles.footerIndexCell)}
+    {...props.column.getFooterProps()}
   />
 ))
 

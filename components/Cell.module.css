@@ -17,8 +17,13 @@
   white-space: nowrap;
 }
 
-.cell:focus {
+.cell.selected {
+  background: rgb(84, 92, 255, 0.2);
   border-radius: 2px;
+}
+
+.cell:focus {
+  background: none;
   box-shadow: inset 0 0 0 1px #545cff;
   outline: none;
 }
@@ -61,28 +66,24 @@ input.cell:focus-visible {
   justify-content: flex-start;
   text-align: left;
 }
+
 .right {
   justify-content: flex-end;
   text-align: right;
 }
+
 .center {
   justify-content: center;
   text-align: center;
 }
 
 .indexCell {
-  align-items: center;
   color: #87898c;
-  display: flex;
   font-size: 11px;
-  flex: 40 0 auto;
-  justify-content: center;
-  width: 40px;
 }
 
 .headerIndexCell,
 .footerIndexCell {
-  flex-grow: 0;
   font-weight: 600;
   height: 48px;
   letter-spacing: 0.25px;

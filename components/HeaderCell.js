@@ -16,8 +16,11 @@ export const HeaderCell = React.memo(({ align, ...props }) => (
   </div>
 ))
 
-export const HeaderIndexCell = React.memo(() => (
-  <div className={clsx(styles.cell, styles.indexCell, styles.headerIndexCell)}>
+export const HeaderIndexCell = React.memo((props) => (
+  <div
+    className={clsx(styles.cell, styles.indexCell, styles.headerIndexCell)}
+    {...props.column.getHeaderProps()}
+  >
     #
   </div>
 ))

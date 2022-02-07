@@ -1,74 +1,61 @@
-import React, { useState } from "react"
+import React from "react"
 import clsx from "clsx"
 import { Checkmark } from "./Checkmark"
-import { CellNavigator } from "./CellNavigator"
 import styles from "./Cell.module.css"
 
 const format = (value) => value
 
 export const Cell = React.memo(
-  ({ editor, formatEditingValue = format, formatValue = format, ...props }) => {
-    const [autoFocus, setAutoFocus] = useState(false)
-    const [editing, setEditing] = useState(false)
+  ({ cell, formatEditingValue = format, formatValue = format, ...props }) => {
+    const isEditing = cell.isEditing
 
-    const overwrite = props.getCellOverwrite(props.row.id, props.column.id)
-    const cellIndex = [
-      props.row.index + 1,
-      props.allColumns.findIndex((c) => c.id === props.column.id) + 1,
-    ]
+    const className = clsx(
+      styles.cell,
+      styles.cellValue,
+      styles[props.align],
+      cell.isSelected && styles.selected
+    )
 
-    const toggleEditing = (value, autoFocus = false) => {
-      setEditing(value)
-      setAutoFocus(autoFocus)
+    const value = formatValue(cell.value, cell.isEditing)
+
+    if (!isEditing) {
+      return (
+        <button className={className} {...cell.getCellProps()}>
+          {value}
+        </button>
+      )
     }
 
-    const updateCell = (e, autoFocus = false) => {
-      const overwrite = formatEditingValue(e.target.value)
-      props.setCellOverwrite(props.row.id, props.column.id, overwrite)
-      toggleEditing(false, autoFocus)
-    }
-
-    const handleKeyDown = (e) => {
-      if (editing) {
-        e.key === "Escape" && toggleEditing(false, true)
-        e.key === "Enter" && updateCell(e, true)
-      } else {
-        e.key === "Enter" && toggleEditing(true, true)
-      }
-    }
-
-    const EditorComponent = editor || InputCell
-    const CellComponent = editing ? EditorComponent : CellNavigator
+    const EditorComponent = props.editor || InputCell
 
     return (
-      <CellComponent
-        autoFocus={autoFocus}
-        className={clsx(styles.cell, styles.cellValue, styles[props.align])}
-        data-index={cellIndex.join("-")}
-        onBlur={editing ? updateCell : undefined}
-        onDoubleClick={() => toggleEditing(true, true)}
-        onKeyDown={handleKeyDown}
-        {...props.cell.getCellProps()}
-      >
-        {formatValue(overwrite ?? props.value, editing)}
-      </CellComponent>
+      <EditorComponent
+        {...props}
+        cell={cell}
+        className={className}
+        onChange={(value) => cell.updateValue(value, formatEditingValue(value))}
+        value={cell.text ?? value}
+      />
     )
   }
 )
 
-const InputCell = React.memo(({ children: initialValue, ...props }) => {
-  const [value, setValue] = useState(initialValue)
-  const handleChange = (e) => setValue(e.target.value)
-  return <input {...props} onChange={handleChange} value={value} />
-})
+const InputCell = React.memo(({ cell, className, onChange, value }) => (
+  <input
+    className={className}
+    onChange={(e) => onChange(e.target.value)}
+    value={value}
+    {...cell.getCellProps()}
+  />
+))
 
-export const IndexCell = React.memo(({ index }) => (
-  <CellNavigator
+export const IndexCell = React.memo(({ cell, row }) => (
+  <button
     className={clsx(styles.cell, styles.indexCell)}
-    data-index={`${index + 1}-0`}
+    {...cell.getCellProps()}
   >
-    {index + 1}
-  </CellNavigator>
+    {row.index + 1}
+  </button>
 ))
 
 export const BooleanCell = React.memo((props) => (
@@ -116,7 +103,7 @@ export const FakeFormulaCell = React.memo((props) => (
   />
 ))
 
-const FakeFormulaInput = React.memo((props) => {
+const FakeFormulaInput = React.memo(({ cell }) => {
   const elementRef = React.useRef()
 
   React.useEffect(() => {
@@ -136,7 +123,7 @@ const FakeFormulaInput = React.memo((props) => {
 
   return (
     <div
-      {...props}
+      {...cell.getCellProps()}
       contentEditable
       className={clsx(styles.cell, styles.right, styles.fakeFormulaEditor)}
       suppressContentEditableWarning

@@ -12,7 +12,8 @@ import {
 } from "react-table"
 import { FixedSizeList as List } from "react-window"
 import InfiniteLoader from "react-window-infinite-loader"
-import { useCellOverwrite } from "./helpers/useCellOverwrite"
+import { useCellRangeSelection } from "./plugins/useCellRangeSelection"
+import { useKeyboardSelection } from "./plugins/useKeyboardSelection"
 import { useFakeLazyData } from "./helpers/useFakeData"
 import { scrollbarWidth } from "./helpers/scrollbarWidth"
 import { moveItem } from "./helpers/arrays"
@@ -27,16 +28,18 @@ import {
   FakeFormulaCell,
   IndexCell,
 } from "./Cell"
-import { HeaderCell } from "./HeaderCell"
+import { HeaderCell, HeaderIndexCell } from "./HeaderCell"
 import {
   FooterCell,
   BooleanFooterCell,
   SumFooterCell,
   PageInfoFooterCell,
+  FooterIndexCell,
 } from "./FooterCell"
 import { Toolbar } from "./Toolbar"
 import { SkeletonLoader } from "./SkeletonLoader"
 import styles from "./Table.module.css"
+import { useCellEditing } from "./plugins/useCellEditing"
 
 const TOTAL_ROWS = 2675
 const PAGE_SIZE = 100
@@ -57,6 +60,13 @@ export const Table = () => {
   }
 
   const [columns, setColumns] = React.useState([
+    {
+      accessor: "Row_Number",
+      width: 40,
+      Cell: IndexCell,
+      Header: HeaderIndexCell,
+      Footer: FooterIndexCell,
+    },
     {
       accessor: "Id",
       minWidth: 270,
@@ -132,7 +142,6 @@ export const Table = () => {
       initialState: { pageIndex: 0, pageSize: PAGE_SIZE },
       manualPagination: true,
       pageCount: -1,
-      ...useCellOverwrite(),
     },
     useFlexLayout,
     useColumnOrder,
@@ -141,7 +150,10 @@ export const Table = () => {
     useSortBy,
     usePagination,
     useRowSelect,
-    useHighlightColumn
+    useHighlightColumn,
+    useCellRangeSelection,
+    useKeyboardSelection,
+    useCellEditing
   )
 
   useEffect(() => fetch({ pageIndex, pageSize }), [fetch, pageIndex, pageSize])
@@ -166,7 +178,7 @@ export const Table = () => {
   const skeletonCount = !data.length ? 25 : 5
   const itemCount = canNextPage ? data.length + skeletonCount : rows.length
   const isItemLoaded = React.useCallback((index) => index < rows.length, [rows])
-  const width = totalColumnsWidth + scrollBarSize + 40 // Index cell
+  const width = totalColumnsWidth + scrollBarSize
 
   const RowRenderer = React.useCallback(
     ({ index, style }) => {
@@ -189,7 +201,6 @@ export const Table = () => {
             if (e.metaKey) row.toggleRowSelected()
           }}
         >
-          <IndexCell index={index} />
           {row.cells.map((cell) => {
             return (
               <Fragment key={cell.getCellProps().key}>
