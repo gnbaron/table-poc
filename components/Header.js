@@ -78,6 +78,7 @@ const HeaderColumn = React.memo(({ children, column }) => {
     >
       {children}
       <HeaderContextMenu column={column} />
+      {column.isHighlighted && <div className={styles.highlight} />}
     </div>
   )
 })

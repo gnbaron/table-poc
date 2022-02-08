@@ -34,6 +34,14 @@ input.cell:focus-visible {
   z-index: 1;
 }
 
+.cell.highlighted {
+  background-color: #ed95122b;
+  border: 2px solid #ed9512;
+  border-top: 0;
+  border-bottom: 0;
+  padding: 8px 12px;
+}
+
 .cellValue {
   align-items: center;
   display: flex;

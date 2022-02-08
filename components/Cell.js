@@ -13,7 +13,8 @@ export const Cell = React.memo(
       styles.cell,
       styles.cellValue,
       styles[props.align],
-      cell.isSelected && styles.selected
+      cell.isSelected && styles.selected,
+      props.column.isHighlighted && styles.highlighted
     )
 
     const value = formatValue(cell.value, cell.isEditing)
