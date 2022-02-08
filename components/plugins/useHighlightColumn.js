@@ -1,6 +1,9 @@
 import React from "react"
 import { actions } from "react-table"
 
+actions.highlightColumn = "highlightColumn"
+actions.resetColumnHighlight = "resetColumnHighlight"
+
 export const useHighlightColumn = (hooks) => {
   hooks.stateReducers.push(reducer)
   hooks.useInstance.push(useInstance)
@@ -8,21 +11,18 @@ export const useHighlightColumn = (hooks) => {
 
 useHighlightColumn.pluginName = "useHighlightColumn"
 
-const TOGGLE_COLUMN_HIGHLIGHT = "toggle-column-highlight"
-
 function reducer(state, action) {
   switch (action.type) {
     case actions.init:
+    case actions.resetColumnHighlight:
       return {
         ...state,
         highlightedColumns: [],
       }
-    case TOGGLE_COLUMN_HIGHLIGHT:
+    case actions.highlightColumn:
       return {
         ...state,
-        highlightedColumns: state.highlightedColumns.includes(action.columnId)
-          ? state.highlightedColumns.filter((id) => id === action.columnId)
-          : [...state.highlightedColumns, action.columnId],
+        highlightedColumns: [...state.highlightedColumns, action.columnId],
       }
   }
 }
@@ -30,16 +30,29 @@ function reducer(state, action) {
 function useInstance(instance) {
   const { allColumns, dispatch, state } = instance
 
-  const toggleColumnHighlight = React.useCallback(
+  const highlightColumn = React.useCallback(
     (columnId) => {
-      dispatch({ type: TOGGLE_COLUMN_HIGHLIGHT, columnId })
+      dispatch({ type: actions.highlightColumn, columnId })
     },
     [dispatch]
   )
+
+  const resetColumnHighlight = React.useCallback(() => {
+    dispatch({ type: actions.resetColumnHighlight })
+  }, [dispatch])
 
   allColumns.forEach((column) => {
     column.isHighlighted = state.highlightedColumns.includes(column.id)
   })
 
-  Object.assign(instance, { toggleColumnHighlight })
+  const isColumnHighlighted = React.useCallback(
+    (columnId) => state.highlightedColumns.includes(columnId),
+    [state]
+  )
+
+  Object.assign(instance, {
+    highlightColumn,
+    isColumnHighlighted,
+    resetColumnHighlight,
+  })
 }

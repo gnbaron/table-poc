@@ -53,6 +53,14 @@ input.cell:focus-visible {
   display: block;
 }
 
+.cell.highlighted {
+  background-color: #ed95122b;
+  border: 2px solid #ed9512;
+  border-top: 0;
+  border-bottom: 0;
+  padding: 8px 12px;
+}
+
 .cellValue {
   overflow: hidden;
   text-overflow: ellipsis;
