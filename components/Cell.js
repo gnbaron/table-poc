@@ -11,9 +11,10 @@ export const Cell = React.memo(
 
     const className = clsx(
       styles.cell,
-      styles.cellValue,
       styles[props.align],
-      cell.isSelected && styles.selected
+      cell.isFocused && styles.focused,
+      cell.isSelected && styles.selected,
+      props.isAutoFilling && styles.autofilling
     )
 
     const value = formatValue(cell.value, cell.isEditing)
@@ -21,7 +22,8 @@ export const Cell = React.memo(
     if (!isEditing) {
       return (
         <button className={className} {...cell.getCellProps()}>
-          {value}
+          <div className={styles.cellValue}>{value}</div>
+          <div className={styles.autofill} {...cell.getCellAutoFillProps()} />
         </button>
       )
     }

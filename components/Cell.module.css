@@ -9,36 +9,54 @@
   font-size: 12px;
   font-weight: 500;
   height: 40px;
-  overflow: hidden;
   padding: 8px 14px;
   position: relative;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .cell.selected {
-  background: rgb(84, 92, 255, 0.2);
+  background: rgb(84, 92, 255, 0.15);
   border-radius: 2px;
   user-select: none;
 }
 
-.cell:focus {
+.cell.selected.autofilling:not(.focused) {
+  background: none;
+  border: 1px dashed #545cff;
+  padding: 8px 13px;
+}
+
+.cell.focused {
   background: none;
   box-shadow: inset 0 0 0 1px #545cff;
   outline: none;
+  z-index: 1;
 }
 
 input.cell:focus-visible {
   background: #fff;
-  box-shadow: inset 0 0 0 2px #545cff, 0px 0px 6px 1px rgb(0, 0, 0, 0.25);
+  box-shadow: inset 0 0 0 2px #545cff, 1px 1px 6px 1px rgb(0, 0, 0, 0.2);
   z-index: 1;
 }
 
+.autofill {
+  background: #545cff;
+  display: none;
+  bottom: -2px;
+  cursor: crosshair;
+  height: 6px;
+  position: absolute;
+  right: -2px;
+  width: 6px;
+}
+
+.cell.focused .autofill {
+  display: block;
+}
+
 .cellValue {
-  align-items: center;
-  display: flex;
-  height: 100%;
-  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .headerCell,

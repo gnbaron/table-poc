@@ -70,6 +70,7 @@ function reducer(state, action, previousState, instance) {
   if (action.type === actions.cellRangeSelectionStart) {
     const {
       startCell: { x, y },
+      startCell,
       event,
     } = action
 
@@ -87,7 +88,7 @@ function reducer(state, action, previousState, instance) {
 
     return {
       ...state,
-      focusedCell: { x, y },
+      focusedCell: startCell,
       selectedCells: newState,
       isSelectingCells: true,
       startCellSelection: { x, y },
@@ -104,17 +105,21 @@ function reducer(state, action, previousState, instance) {
     } = instance
 
     // Get cells between cell start and end (range)
-    const rowsIndex = [startCellSelection.x, selectingEndCell.x]
-    const columnsIndex = [startCellSelection.y, selectingEndCell.y]
+    const columnsIndex = [
+      startCellSelection.x,
+      // allow auto filling only in vertical range selection
+      state.isAutoFilling ? startCellSelection.x : selectingEndCell.x,
+    ]
+    const rowsIndex = [startCellSelection.y, selectingEndCell.y]
 
     // all selected rows and selected columns
     const newState = []
     for (
-      let y = Math.min(...columnsIndex);
-      y <= Math.max(...columnsIndex);
-      y++
+      let x = Math.min(...columnsIndex);
+      x <= Math.max(...columnsIndex);
+      x++
     ) {
-      for (let x = Math.min(...rowsIndex); x <= Math.max(...rowsIndex); x++) {
+      for (let y = Math.min(...rowsIndex); y <= Math.max(...rowsIndex); y++) {
         newState.push({ x, y })
       }
     }

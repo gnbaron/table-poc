@@ -1,17 +1,35 @@
-import { actions } from "react-table"
+import { actions, makePropGetter } from "react-table"
 
 actions.cellEditingStart = "cellEditingStart"
 actions.cellEditingChange = "cellEditingChange"
 actions.cellEditingEnd = "cellEditingEnd"
 actions.cellEditingCancel = "cellEditingCancel"
+actions.toggleAutoFill = "toggleAutoFill"
 
 export const useCellEditing = (hooks) => {
+  hooks.getCellAutoFillProps = [defaultGetCellAutoFillProps]
   hooks.getCellProps.push(getCellProps)
   hooks.stateReducers.push(reducer)
+  hooks.useInstance.push(useInstance)
   hooks.prepareRow.push(prepareRow)
 }
 
 useCellEditing.pluginName = "useCellEditing"
+
+const defaultGetCellAutoFillProps = (props, { instance }) => {
+  const { dispatch } = instance
+
+  const toggleAutofill = (value) =>
+    dispatch({ type: actions.toggleAutoFill, value })
+
+  return [
+    props,
+    {
+      onMouseDown: () => toggleAutofill(true),
+      onMouseUp: () => toggleAutofill(false),
+    },
+  ]
+}
 
 const getCellProps = (props, { instance, cell }) => {
   const {
@@ -48,11 +66,12 @@ const getCellProps = (props, { instance, cell }) => {
   ]
 }
 
-function reducer(state, action) {
+function reducer(state, action, previousState, instance) {
   switch (action.type) {
     case actions.init:
       return {
         ...state,
+        isAutoFilling: false,
         cellEditingId: null,
         cellEditingText: null,
         cellEditingValue: null,
@@ -89,12 +108,43 @@ function reducer(state, action) {
         cellEditingText: null,
         cellEditingValue: null,
       }
+    case actions.toggleAutoFill:
+      return {
+        ...state,
+        isAutoFilling: action.value,
+      }
+    case actions.cellRangeSelectionEnd: {
+      if (!state.isAutoFilling || state.selectedCells.length <= 1) return state
+
+      const allCells = instance.rows.flatMap((row) => row.cells)
+
+      const value = state.focusedCell.value
+      const overwrites = state.selectedCells.reduce((list, { x, y }) => {
+        const cell = allCells.find((cell) => cell.x === x && cell.y === y)
+        return cell ? { ...list, [cell.id]: value } : list
+      }, state.overwrites)
+
+      return {
+        ...state,
+        isAutoFilling: false,
+        overwrites,
+      }
+    }
   }
+}
+
+function useInstance(instance) {
+  const { isAutoFilling } = instance.state
+
+  Object.assign(instance, {
+    isAutoFilling,
+  })
 }
 
 function prepareRow(row, { instance }) {
   const {
     dispatch,
+    getHooks,
     state: { cellEditingId, cellEditingText, overwrites },
   } = instance
   row.allCells.forEach((cell) => {
@@ -104,5 +154,10 @@ function prepareRow(row, { instance }) {
     cell.text = cellEditingText
     cell.updateValue = (text, value) =>
       dispatch({ type: actions.cellEditingChange, text, value })
+
+    cell.getCellAutoFillProps = makePropGetter(
+      getHooks().getCellAutoFillProps,
+      { instance }
+    )
   })
 }
