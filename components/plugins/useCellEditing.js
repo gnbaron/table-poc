@@ -1,9 +1,11 @@
+import React from "react"
 import { actions, makePropGetter } from "react-table"
 
 actions.cellEditingStart = "cellEditingStart"
 actions.cellEditingChange = "cellEditingChange"
 actions.cellEditingEnd = "cellEditingEnd"
 actions.cellEditingCancel = "cellEditingCancel"
+actions.setCellOverwrite = "setCellOverwrite" // exposed to user on an instance
 actions.toggleAutoFill = "toggleAutoFill"
 
 export const useCellEditing = (hooks) => {
@@ -108,11 +110,6 @@ function reducer(state, action, previousState, instance) {
         cellEditingText: null,
         cellEditingValue: null,
       }
-    case actions.toggleAutoFill:
-      return {
-        ...state,
-        isAutoFilling: action.value,
-      }
     case actions.cellRangeSelectionEnd: {
       if (!state.isAutoFilling || state.selectedCells.length <= 1) return state
 
@@ -130,14 +127,38 @@ function reducer(state, action, previousState, instance) {
         overwrites,
       }
     }
+    case actions.toggleAutoFill:
+      return {
+        ...state,
+        isAutoFilling: action.value,
+      }
+    case actions.setCellOverwrite:
+      return {
+        ...state,
+        overwrites: { ...state.overwrites, ...action.overwrites },
+      }
   }
 }
 
 function useInstance(instance) {
-  const { isAutoFilling } = instance.state
+  const {
+    dispatch,
+    state: { isAutoFilling },
+  } = instance
+
+  const setCellOverwrite = React.useCallback(
+    (overwrites) => {
+      return dispatch({
+        type: actions.setCellOverwrite,
+        overwrites,
+      })
+    },
+    [dispatch]
+  )
 
   Object.assign(instance, {
     isAutoFilling,
+    setCellOverwrite,
   })
 }
 
@@ -151,6 +172,7 @@ function prepareRow(row, { instance }) {
     cell.id = `${row.id}-${cell.column.id}`
     cell.isEditing = cellEditingId === cell.id
     cell.value = overwrites[cell.id] ?? cell.value
+    cell.originalValue = cell.originalValue || cell.value
     cell.text = cellEditingText
     cell.updateValue = (text, value) =>
       dispatch({ type: actions.cellEditingChange, text, value })

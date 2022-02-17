@@ -4,6 +4,8 @@ import { actions, functionalUpdate } from "react-table"
 actions.cellRangeSelectionStart = "cellRangeSelectionStart"
 actions.cellRangeSelecting = "cellRangeSelecting"
 actions.cellRangeSelectionEnd = "cellRangeSelectionEnd"
+actions.cellRangeSelectionCopy = "cellRangeSelectionCopy"
+actions.cellRangeSelectionPaste = "cellRangeSelectionPaste"
 actions.setSelectedCells = "setSelectedCells" // exposed to user on an instance
 
 export const useCellRangeSelection = (hooks) => {
@@ -27,6 +29,8 @@ const getCellProps = (props, { instance, cell }) => {
     dispatch({ type: actions.cellRangeSelecting, selectingEndCell, event })
   const end = (endCell, event) =>
     dispatch({ type: actions.cellRangeSelectionEnd, endCell, event })
+  const copy = () => dispatch({ type: actions.cellRangeSelectionCopy })
+  const paste = () => dispatch({ type: actions.cellRangeSelectionPaste })
 
   return [
     props,
@@ -50,7 +54,14 @@ const getCellProps = (props, { instance, cell }) => {
           selecting(cell, e)
         }
       },
+      onKeyDown: (e) => {
+        if (e.metaKey && e.key === "c") copy()
+        if (e.metaKey && e.key === "v") paste()
+
+        props.onKeyDown && props.onKeyDown(e)
+      },
       tabIndex: 0,
+      "data-selected": cell.isSelected || cell.isFocused,
     },
   ]
 }
@@ -138,6 +149,61 @@ function reducer(state, action, previousState, instance) {
       startCellSelection: null,
       endCellSelection: null,
     }
+  }
+
+  if (action.type === actions.cellRangeSelectionCopy) {
+    const data = instance.rows
+      .map((row) => {
+        instance.prepareRow(row)
+        return row.cells
+          .filter((cell) => cell.isSelected || cell.isFocused)
+          .map((cell) => cell.value)
+          .join('"\t"')
+      })
+      .filter((rowValues) => rowValues.length)
+      .join('"\n"')
+    navigator.clipboard.writeText(data)
+
+    return state
+  }
+
+  if (action.type === actions.cellRangeSelectionPaste) {
+    const selectedCell = state.selectedCells[0] || state.focusedCell
+    if (!selectedCell) return
+
+    const { x, y } = selectedCell
+    const selectedCells = []
+
+    navigator.clipboard.readText().then((text) => {
+      const data = text.split("\n").map((row) => row.split("\t"))
+      const totalRows = data.length
+      const rows = instance.rows.slice(y, y + totalRows)
+
+      const overwrites = {}
+      rows.forEach((row, i) => {
+        instance.prepareRow(row)
+
+        const totalColumns = data[i].length
+        const cells = row.cells.slice(x, x + totalColumns)
+        cells.forEach((cell, j) => {
+          const { originalValue } = cell
+          let value = data[i][j]
+          if (originalValue instanceof Date) {
+            value = new Date(value)
+          } else if (typeof originalValue === "boolean") {
+            value = value.toLowerCase() === "true"
+          } else if (typeof originalValue === "number") {
+            value = Number(value)
+          }
+          overwrites[cell.id] = value
+          selectedCells.push({ x: cell.x, y: cell.y })
+        })
+      })
+
+      instance.setCellOverwrite(overwrites)
+      instance.setSelectedCells(selectedCells)
+    })
+    return state
   }
 
   if (action.type === actions.setSelectedCells) {
