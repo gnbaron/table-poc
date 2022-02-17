@@ -6,6 +6,7 @@ actions.cellRangeSelecting = "cellRangeSelecting"
 actions.cellRangeSelectionEnd = "cellRangeSelectionEnd"
 actions.cellRangeSelectionCopy = "cellRangeSelectionCopy"
 actions.cellRangeSelectionPaste = "cellRangeSelectionPaste"
+actions.cellRangeSelectionReset = "cellRangeSelectionReset"
 actions.setSelectedCells = "setSelectedCells" // exposed to user on an instance
 
 export const useCellRangeSelection = (hooks) => {
@@ -19,7 +20,7 @@ useCellRangeSelection.pluginName = "useCellRangeSelection"
 
 const getCellProps = (props, { instance, cell }) => {
   const {
-    state: { cellEditingId, isSelectingCells },
+    state: { cellEditingId, focusedCell, isSelectingCells },
     dispatch,
   } = instance
 
@@ -29,6 +30,7 @@ const getCellProps = (props, { instance, cell }) => {
     dispatch({ type: actions.cellRangeSelecting, selectingEndCell, event })
   const end = (endCell, event) =>
     dispatch({ type: actions.cellRangeSelectionEnd, endCell, event })
+  const reset = () => dispatch({ type: actions.cellRangeSelectionReset })
   const copy = () => dispatch({ type: actions.cellRangeSelectionCopy })
   const paste = () => dispatch({ type: actions.cellRangeSelectionPaste })
 
@@ -60,6 +62,9 @@ const getCellProps = (props, { instance, cell }) => {
 
         props.onKeyDown && props.onKeyDown(e)
       },
+      onBlur: (e) => {
+        if (e.relatedTarget) reset()
+      },
       tabIndex: 0,
       "data-selected": cell.isSelected || cell.isFocused,
     },
@@ -67,10 +72,13 @@ const getCellProps = (props, { instance, cell }) => {
 }
 
 function reducer(state, action, previousState, instance) {
-  if (action.type === actions.init) {
+  if (
+    action.type === actions.init ||
+    action.type === actions.cellRangeSelectionReset
+  ) {
     return {
       ...state,
-      selectedCells: instance.initialState.selectedCells || [],
+      selectedCells: [],
       isSelectingCells: false,
       startCellSelection: null,
       endCellSelection: null,
@@ -176,7 +184,6 @@ function reducer(state, action, previousState, instance) {
 
     navigator.clipboard.readText().then((text) => {
       const data = text.split("\n").map((row) => row.split("\t"))
-      console.log(data)
       const totalRows = data.length
       const rows = instance.rows.slice(y, y + totalRows)
 

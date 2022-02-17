@@ -59,10 +59,12 @@ const getCellProps = (props, { instance, cell }) => {
 
         props.onKeyDown && props.onKeyDown(e)
       },
-      onBlur: () => {
+      onBlur: (e) => {
         if (cellEditingId === cell.id) {
           end()
         }
+
+        props.onBlur && props.onBlur(e)
       },
     },
   ]
