@@ -39,7 +39,7 @@ const generateRows = (n) => new Array(n).fill(null).map(randomRow)
 
 const randomRow = () => ({
   Id: faker.datatype.uuid(),
-  ARR: faker.finance.amount(),
+  ARR: faker.random.number({ min: 10, max: 1000, precision: 0.01 }),
   CreatedAt: faker.date.recent(),
   CloseDate: faker.date.recent(),
   DealClosed: faker.datatype.boolean(),

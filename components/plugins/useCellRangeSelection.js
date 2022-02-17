@@ -158,10 +158,10 @@ function reducer(state, action, previousState, instance) {
         return row.cells
           .filter((cell) => cell.isSelected || cell.isFocused)
           .map((cell) => cell.value)
-          .join('"\t"')
+          .join("\t")
       })
       .filter((rowValues) => rowValues.length)
-      .join('"\n"')
+      .join("\n")
     navigator.clipboard.writeText(data)
 
     return state
@@ -176,6 +176,7 @@ function reducer(state, action, previousState, instance) {
 
     navigator.clipboard.readText().then((text) => {
       const data = text.split("\n").map((row) => row.split("\t"))
+      console.log(data)
       const totalRows = data.length
       const rows = instance.rows.slice(y, y + totalRows)
 
